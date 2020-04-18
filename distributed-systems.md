@@ -93,3 +93,41 @@ message Person {
   * New code can read the unique Field Tag Number and know what that is
   * New fields must NOT be required, must be optional or have a default value. Otherwise checks fail old data immediately. 
   * Can only remove fields that are optional. Also once removed, cannot reuse removed field's tag number. 
+
+### Merits of Schemas
+* Can be much more compact thant "binary JSON" variants since they can ommit field names from encoded data
+* Schema valuable form of documentation. Must remain up to date since it's real code
+* Must check backward/forward comptability before code pushes
+* Type checking at compile time 
+
+## MODES OF DATA FLOW
+
+### Dataflow through Databases
+* Backward/forward compatibility important bc old code might read new code and vice veersa
+* Must be careful that old code doesn't accidentally update data with new fields without the new fields. 
+
+### Dataflow Through Services: REST and RPC
+* Simple model is that you have a server and client. However a server can be a client to another server. 
+* This is has been called a Service Oriented Architecture or Microservices architecture. 
+* In this type of architecture services can be worked on independently, again touching backward / forward compatibility
+* Each service is owned by one team and should be able to update frequently without consulting other services. 
+
+**Web Services** 
+* When HTTP is used as the protocol for talking to the service. Misnomer as it can be in other contexts outside of web. e.g.:
+  * Client on mobile or web app makes an ajax request to service over the internet
+  * Service makes a request to another as part of an organization's microservice architecture
+  * Services makes request to another third party service
+* REST: not a protocol, but rather a design philosophy built on the principles of HTTP
+  * simple data formats
+  * URL for identifying resources
+  * uses HTTP features for cache control, authentication and content type negotiation
+* SOAP: an XML based protocol for making network API requests.
+  * Commonly used over HTTP, although it aims to be independent from HTTP and avoids most HTTP features. 
+  * comes with its own standards
+  * Generally more complex, sometimes interoperability issues with other vendor's implementations, used by big enterprise companies.
+
+**(Remote Procedure Calls) RPCs**
+* Circa 1970s. The RPC model attempts to make calling a remote network service look like calling a method or function 
+  * local functions are predictable and succeed or fail depending on parameters under your control. network requests are not. 
+
+
