@@ -128,6 +128,55 @@ message Person {
 
 **(Remote Procedure Calls) RPCs**
 * Circa 1970s. The RPC model attempts to make calling a remote network service look like calling a method or function 
-  * local functions are predictable and succeed or fail depending on parameters under your control. network requests are not. 
+  * local functions are predictable and succeed or fail depending on parameters under your control. 
+    network requests are not and fail for reasons outside your control. 
+  * local functions have predictable results or failures results. Network requests may return without a result and
+    you don't know if your request actually went through or not
+  * If you retry a failed network request it could be the case that the requests are getting through 
+    and the responses are getting lost. You are making multiple requests
+  * Networks requests take longer than function calls. a lot longer
+  * Arguments must be encoded to be sent over network. This get's complicated with larger objects as parameters
+  * Client and Service may be implemented in different languages. RPC framework must translate datatypes in different languages 
+    which may lead to ugliness. 
+* Newer gen RPC frameworks are more explicit about the fact that remote requests are diff from local func calls
+  * Usually support some type of _promises_ 
+* Custom RPC protocols with a binary encoding format can achieve better performance over the generic JSON over REST
+* JSON over REST is good for experimentation & debugging, has wide language support with vast ecosystem of tools
+* For these reasons, REST dominates public API's. RPC frameworks are mainly used on requests between services in the same organization. 
 
+### Message Passing Dataflow
+* Somewhere between RPC and databases. 
+  * Similar to RPC in that client's request is delivered to another process with low latency
+  * Similar to database in that message is not sent over network connection, but over a _message broker_ or _message queue_
+* Several advantages compared to direct RPC
+  * Can act as a buffer if recipient in overloaded, improving system reliability
+  * Can automatically redeliver messages to a process that has crashed, preventing loss of message
+  * Avoids the need to know IP address and port number of recipient (useful in cloud development)
+  * Allows one message to be sent to several recipients
+  * Decouples sender from recipient (sender just publishes messages and doesn't care who consumes them)
+* Sender sends and forgets about. It can receive a response but usually through a different channel
+* Message brokers usually don't enforce data models, giving a lot of flexibility
 
+### Summary
+* Many services need to support rolling upgrades. This allows faulty releases to be detected and rolled back at smaller scales
+* Rolling upgrades allow us to check backward/forward compatability in real time
+* JSON, XML and CSV are widespread. These formats are somewhat vague about data types, so you have careful with things like binary strings or numbers
+* Binary schema-driven formats like Thrift, Protocol Buffers are compact & efficient with clearly defined f/b compatability semantics.
+  * Schemas are useful for documentation. 
+  * Downside is that they have to be decoded to be human readable
+* Scenarios in which data encodings are important:
+  * Databases where writing and reading persisted data requries encoding and decoding
+  * RPC and REST APIs where the client encodes a request, server decodes request and encodes a response that the client finally decodes 
+  * Async message passing where nodes communicate by sending encoded messages that are decode by recipients
+* With care, backward/forward compatability and rolling upgrades are achievable, enabling rapid app evolution and frequent code deployment. 
+
+# PART 2 Distributed Data
+* How do we tackle storage and retrieval of data across multiple machines? 
+* Why would you want to split your data up?
+  * Scalability: if data volume and read/write load goes up, you can spread this across multiple machines
+  * Fault Tolerance/high availability: Multiple machines give you redundancy, allowing takeover of failed machines. 
+  * Latency: You can have machines spread over the world, reducing distance packets have to travel. 
+* Vertical scaling is easier, but no redundancy, exponential scaling. Horizontal Scaling is tough and more complex, but linearly scales. 
+* Two common ways data is replicated across multiple nodes
+  * Replication: Copying. Procides redundancy, may help performance
+  * Partitioning: Splitting. Also known as sharding
