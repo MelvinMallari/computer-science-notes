@@ -180,3 +180,23 @@ message Person {
 * Two common ways data is replicated across multiple nodes
   * Replication: Copying. Procides redundancy, may help performance
   * Partitioning: Splitting. Also known as sharding
+
+## Chapter 5 Replication 
+* Replication: keeping a copy of the same data on multiple machines communicating via a network
+* In this chapter we will make assumption that data set is small and each machine can hold a whole copy
+* Difficulty lies in changing of data. 
+* Three popular algorithms for replicating changes: _single-leader_, _multi-leader_, and _leaderless_
+
+### Leaders and followers
+* Every write to database must be processed by every _replica_ (node that stores a copy of database).
+* Most common solution is called _leader-based replication_ (aka _master-slave replciation_)
+  * One replica is designated leader. Clients must send requests to leader which writes new data to its local storage
+  * Whenever leader makes a write, it sends a data change to its followers as part of a _replication log_ or _change stream_
+  * Client can read from leader or follower, but writes can only be processed by the leader
+* There are _synchronous_ and _asynchronous_ writes to the followers
+  * with _synchronous_ replication, 
+    * advantage is follower is guaranteed to have up-to-date copy of data, readily available if leader fails
+    * disadvantage is that writes cannot be processed if any of the followers fail
+    * this disadvantage makes it impractical that all nodes are synchronous writes, instead we usually have only one synchronous follower. This is called a _semi-syncronous_ configuration.
+* Often leader-based replication is configured to be completely async. This means writes are not guaranteed durable. 
+
