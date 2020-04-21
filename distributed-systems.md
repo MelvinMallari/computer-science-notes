@@ -200,3 +200,43 @@ message Person {
     * this disadvantage makes it impractical that all nodes are synchronous writes, instead we usually have only one synchronous follower. This is called a _semi-syncronous_ configuration.
 * Often leader-based replication is configured to be completely async. This means writes are not guaranteed durable. 
 
+### Setting up new followers
+* Can't just copy from one node to another, data is in flux. 
+* Process is:
+  * take a snapshot of leader's database 
+  * copy snapshot to new follower node
+  * follower connects to leader, requests all changes since snapshot was taken.
+  * follower processes the backlog of data changes until it's _caught up_
+
+### Handling node outtages
+* Follower Failure: Catch-up recovery
+  * follower keeps a log of data changes received from leader
+  * from it's log it knows its last processed transaction and request the backlogged changes from the leader
+* Leader failure: Failover
+  * One of the followers needs to be the new leader, in a process called _failover_
+    * _Determine that the leader has failed_: if the leader node hasn't responded for some period of time it is assumed dead.
+    * _Choosing new leader_: Done through election process (chosen by majority of remaining replicas) or elected by a previously elected _controller node_. Best candidate usually one with most up-to-date log. Getting node agreement is a consensus problem.
+    * _Reconfigure the system to use the new leader_: clients must now send requests to new leader. Old leader must be ensured to transition into a follower. 
+  * Many things can go wrong during failover:
+    * Old leader rejoins cluster after new leader chosen, what happens any write discrepancy? Common solution is to discard old leader's writes, but this may violate durability expectations.
+    * Discarded writes are dangerous if other storage systems outside the database need to be coordinated with db's contents.
+    * Fault scenario in which two nodes believed to be leader called _split brain_. Safety shtudown mechanism must be carefully designed in this scenario.
+
+### Implementation of Replications log
+**Statement-based replication**
+Simple implementation is leader logs every write request and sends that statement log to followers. This means that every follower executes that SQL statement. Breaks down during the following
+  - any nondeterministic function like NOW() or RAND() produces incorrect replication
+  - autoincrementing columns
+  - statements that have side effects
+Other replication methods are mostly used now a days.
+**Write-ahead log (WAL) shipping** 
+The log is an append-only sequence of bytes containing all writes to the database. Leader sends this to its followers. Used by PostgreSQL nand Orgacle. Disadvantage is that that the logs describe the data at a very low level in a way that's coupled to the storage engine. Operationally this means that all nodes must go down to during versioning update because different storage enginer versions are incompatible. 
+**Logical (row-based) log replication**
+ A sequence of records describing writes to a database at the granularity of a row. Logical logs are decoupled from storage engine internals, allowing backwards compatibility.
+ **Trigger-based replication** 
+A trigger lets you register custom application code that automatically executes data change in the db. Great overhead and prone to bugs and limitations, but is useful due to flexibility.
+
+### Problems with replication lag
+* If you read from a follower that has yet to be update, you will get conflicting information
+* Follower will catch up eventually given a long enough wait in what is known was _eventual consistency_
+**Reading your own writes**
