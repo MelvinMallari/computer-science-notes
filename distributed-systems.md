@@ -240,3 +240,38 @@ A trigger lets you register custom application code that automatically executes 
 * If you read from a follower that has yet to be update, you will get conflicting information
 * Follower will catch up eventually given a long enough wait in what is known was _eventual consistency_
 **Reading your own writes**
+* Possible to read a replica that has yet to process your async write. 
+* Need _read-after-write consistency_
+  * When reading something that may have been modified, always read from leader
+  * If most thing in app are editable by user, have a period after writes where user just reads from reader
+  * Client records timestamp of most recent write. Read replica makes sures it has a write after this timestamp. Could be logical timestamp (certain order) else clock sync critical.
+* Sometimes you need _cross device read after write consistency_
+  * Can't just remember timestamps, this metadata would have to be centralized
+  * Must route request from all user's device to the same datacenter that holds the leader
+
+**Monotonic Reads**
+* Possible to see things move backwards in time. 
+* Multiple queries can reach different replicas at different update levels.
+* Eventual Consistency < Monotonic Reads < Strong Consistency
+  * User reads only from one replica, however if the replica fails, they will be routed to another replica
+
+**Consistent Prefix Reads**
+* Must guarantee that certain things (like conversations/comments) are stored in proper order
+* Simple solution is any writes causally related will go to the same partition
+
+### Multi-leader Replication
+* Doesn't make sense within a single datacenter configuration, but does in a multi datacenter one
+* Benefits
+  * Performance: distributed leaders are closer to users, reducing latency
+  * Outtage Tolerance: If a data center with a leader fails, each data center continues operating independently and replica catches up when it boots up
+  * Network Problem Tolerance: temporary network interrupts bother multi-leader configurations less
+* offline operation and collaboritive editing are essentially multi-leader replication configurations
+
+### Handling Write Conflicts
+* Simplest strategy is to avoid them when possible. If the app makes sure all the writes go through the same leader, then conflicts cannot occur
+* In the case where multiple leaders have conflicting writes, the database must resolve in a convergent way
+  * Assign an ID, and pick the higher ID as the write. Or use time stamp in _last write wins_. Dangerously prone to data loss
+  * Use the replica's number to decide. Data loss
+  * Merge the values together e.g. ("B/C")
+  * Store the changes in a data structure and prompt the user
+* Can write custom conflict resolution on write and read
