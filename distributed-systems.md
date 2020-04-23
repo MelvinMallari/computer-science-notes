@@ -275,3 +275,20 @@ A trigger lets you register custom application code that automatically executes 
   * Merge the values together e.g. ("B/C")
   * Store the changes in a data structure and prompt the user
 * Can write custom conflict resolution on write and read
+
+### Multileader replication topologies
+* There exist different topologies in which leaders update each other circlular, star, all-to-all
+* all-to-all is the least fragile, node's in a path may fail and prevent update propogation
+* all-to-all does face replication issues due to varying network communication speeds
+
+### Leaderless Replication
+* Some storage systems like Dynamo allow writes to any replica in a leaderless system
+* Some via direct client writes, others to writes to a controller node that handles direction of writes
+
+**Writing to a database when a node is down**
+* Write is considered successful if most writes are succesful
+* When reading, read from multiple nodes. This prevents trouble with reading an outdated node
+* How does a downed node catch up?
+  * Read Repair: update nodes as you read and see stale information
+  * Anti-entropy process: background processes that constantly look for data differences and copy missing data from one replica to another
+  * Note that just read repair would mean data not read often will get very stale
