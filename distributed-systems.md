@@ -292,3 +292,22 @@ A trigger lets you register custom application code that automatically executes 
   * Read Repair: update nodes as you read and see stale information
   * Anti-entropy process: background processes that constantly look for data differences and copy missing data from one replica to another
   * Note that just read repair would mean data not read often will get very stale
+
+### Quorums for reading and writing
+* w: writes, r:reads, n: num nodes. As long as w + r > n we expect to get up to date value when reading because at least one of the r nodes we read must be up to date. 
+* w, r, n parameters are configurable, can customize for application need
+
+### Limitations of Quorum Consistency
+* Often r and w are chosen to be > n/2. This ensures w + r > n up to n/2 node failures
+* Above is not a rule, quorum is only reached when r and w have overlaps, other quorum assignments possible
+* You may set w and r to smaller numbers such that w + r =< n
+  * In this configuration, more likely to read stale values
+  * Also more latency and higher availability. Can continue processing reads/writes even despite network latency or replica unavailability.
+* Even under w + r > n, edge cases where stale value returned possible:
+  * If a Sloppy Quorum is usedw writes may end up on differnt nodes than r reads
+  * If two writes occurr concurrently, it is not clear which one happened first. Only safe solution is to merge concurrent writes. If a winner is picked based on timestamp, writes can be lost due to clock skew.
+  * read can come concurrently with a write
+  * if a node fails and is restored with stale data, number of replicas storing new value falls below quorum condition
+  * Edge cases w/ unlucky timing
+
+### Sloppy Quorums and Hinted Handoff
