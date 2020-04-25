@@ -2,7 +2,7 @@
 
 ## 309 Best Time to Buy and Sell Stock with Cooldown
 
-This can be solved with dynamic programming. The three different actions (buy, sell, rest) can take us between 3 different states: s0, s1, s2.
+This can be solved with dynamic programming. The three different actions (buy, sell, rest) take us between 3 different states: s0, s1, s2.
 
 **States**
 s0 (rest -> s0) buy-> s1 (rest-> s1) sell -> s2 rest-> s0

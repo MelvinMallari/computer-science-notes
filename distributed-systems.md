@@ -311,4 +311,54 @@ A trigger lets you register custom application code that automatically executes 
   * Edge cases w/ unlucky timing
 
 ### Sloppy Quorums and Hinted Handoff
+* DB's with appropriately configured quorums can tolerate failure of individual nodes without need for failover.
+* Can also tolerate slow individual nodes because they can return when w or r nodes respond
+* These characteristics make leaderless replication appealing for high availability and low latency that can tolerate occasional slow reads
+* However network can cut off large amount of nodes, effectively "killing" them
+* In this event, should we return errors for all requests? or should we write to remaining live nodes.
+* Sloppy Quorum: writes still require w and r succesful response, but may include nodes not among the designated "n" nodes
+* Hinted Handoff: Any writes sent to temporary nodes are sent to appropriate nodes
+* Sloppy Quorums increase write durability at the expense of read consistency
 
+### Detecting Concurrent Writes
+* In dynamo-style dtabases conflicts can arise during concurrent writes and read repair/hinted handoffs.
+* Concurrent write conflict solutions:
+
+**Last write wins**
+* Discard "old" writes, and always write more "recent" ones. Consensus is needed on what's older and newer
+* Can attach a timestamp to each write and pick the biggest timestamps
+* LWW achieves the goal of eventual convergence at the expense of durability
+
+**The "happens-before" relationship and concurrency**
+* An operation A happens beofre another operation B if B knows about A, or depends on A in some way
+* Two operations are oncurrent if netiher happens beofre the other
+* When you have two operations A, B. There are 3 possiblities. A before B. B before A. or A & B concurrent. Need an algorithm that determines causal or concurrent
+* User versioning during reads and writes to consider which operations happen before and after
+
+**Merging concurrently written values**
+* Clients may have to clean concurrently written values
+* Union of two writes usually reasonable
+* Cannot simply delete item from DB if removed, must mark with appropriate version when deleted durinng sibling merge (marking with a "tombstone")
+* There are data structures that exist that can perform this merging automatically
+
+**Version Vectors**
+* Single version number no sufficient w multiple replicas
+* Need version number per replica as well as per key
+* Each replica increments its own version number when processing a write and keeps track of version numbers it has seen from other replicas
+* collection of numbers from all the replicas is called a _version vector_
+
+### Chapter 5 Summary
+* Replication achieves 
+  * High Availability: system still up even if some nodes down
+  * Disconnected Operation: system works, even if connections interrupted
+  * Latency: Nodes aroudn the world makes finding closer one more likely
+  * Scalability: More nodes == more nodes you can read from
+* Three main approaches to replication:
+  * Singer Leader Replication: Clients send all writes to a leader which sends a stream of data change events to other replicas. Reads can be performed by everybody
+  * Multi-Leader replication: Writes sent to multiple leader nodes that send stream of data to each other and followers
+  * Leaderless Replication: Clients sned each write to several nodes and read from several nodes in parallel. 
+* SLR Popular because simple, no conflict resolution needed.
+* MLA and LR more robust in presence of faulty nodes, network interruptions and latency spikes at the cost of being more complex and providing weak consistency guarantees
+* MLA and LR allow concurrent writes and therefore have issues with conflicts
+
+## Chapter 6 Partitioning
