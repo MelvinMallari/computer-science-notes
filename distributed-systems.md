@@ -311,3 +311,4 @@ A trigger lets you register custom application code that automatically executes 
   * Edge cases w/ unlucky timing
 
 ### Sloppy Quorums and Hinted Handoff
+
