@@ -362,3 +362,30 @@ A trigger lets you register custom application code that automatically executes 
 * MLA and LR allow concurrent writes and therefore have issues with conflicts
 
 ## Chapter 6 Partitioning
+* Also known as sharding. The breaking up of data across multiple machines.
+* Mainly want to partition for _scalability_
+* Usually combined with replication. Choice of parititioning scheme independent of replication scheme
+
+### Partitioning of Key-Value Data
+* Goal is to spread the data evenly across nodes
+* If partitionin is unfair we call it skewed. A paritition with high load is called a hot spot
+* You could simply assign data to nodes randomly. However, when you read you have no idea where the data is, so you must query all nodes.
+* Let's assume for now that you have a simple key-value data model in which you always access a record by its primary key. You could quickly find what you're looking for
+
+### Partitioning by Key Range
+* Assign a continuous range of keys to each partition. These ranges are not necessarily evenly spaced .. partitions are adapted to the data to distribute it evenly
+* Within each partition key keys in sorted order. Key can be a concatenated index to fetch several related records in one query. 
+* Must be careful when choosing the acess pattern to avoid hot spots. (e.g. choosing to partition by timestamp(day)- writes all go to a single partition leading to a hotspot)
+
+### Partitioning by Hash Key
+* Many distributed stores use a hash function to determine the partition of a given key. A good hash function takes skewed data and makes it evenly distributed
+* Each partition falls into a range of hashes.
+* By using the hash of the key for partitioning we lose the ability to do efficient range queries. Keys that were adjacaent are now scattered
+* Can use a compromise between the two partitioning strategies known as a compound primary key
+
+  * Hash the first key, sort by the second concatenated key
+
+### Skewed Workloads and Relieving Hot Spots
+* Hashing keys isn't enough to avoid Hot Spots entirely. (e.g. celebrity users may cause a storm of activity when they do something)
+* This results in a large volume of writes to the same key
+* Simple solution is to add a random number to the beginning or end key. This distributes writes across different nodes. Tradeoff is reads have to access all nodes with data.

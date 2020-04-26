@@ -95,3 +95,35 @@ class Solution:
     
     return res
 ```
+
+## 32 Longest Valid Parentheses
+* Use a stack
+* Loop through string, if the parenthese is an opener, append index to the stack
+* if closer, pop from the stack
+  * If the last one was an opener, then we just matched a valid pair
+  * If the stack is empty, append the invalid closer so we can reference it as a left boundary
+  * If the stack is not empty, then we update the max valid we've seen so far
+    * Key idea is any difference b/w curr index and last invalid index stored in stack represents a valid parentheses chunk. Record the longest chunk seen.
+
+**Edge Case**
+* (1) Consider the case where the whole parentheses is valid. Must instantiate the stack with -1 to account for the length of whole string
+
+Solution:
+`T: o(n), S: o(n)`
+```python
+class Solution:
+  def longestValidParentheses(self, s):
+    res, stack = 0, [-1] #(1)
+
+    for i, ch in enumerate(s):
+      if ch == '(':
+        stack.append(i)
+      else:
+        stack.pop()
+        if not stack:
+          stack.append(ch)
+        else:
+          res = max(res, i - stack[-1])
+    return res
+```
+
