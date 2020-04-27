@@ -389,3 +389,38 @@ A trigger lets you register custom application code that automatically executes 
 * Hashing keys isn't enough to avoid Hot Spots entirely. (e.g. celebrity users may cause a storm of activity when they do something)
 * This results in a large volume of writes to the same key
 * Simple solution is to add a random number to the beginning or end key. This distributes writes across different nodes. Tradeoff is reads have to access all nodes with data.
+
+### Partitioning and Secondary Indexes
+* Usually doesn't identify are record uniquely, but rather is a way of searching for occurrences of a particular value
+  * e.g. find all actions by user 123, find all articles containing the word hogwash
+* Problem with secondary indexes is they don't map neatly to partitions. 
+
+### Partitioning Secondary Indexes by Document
+* e.g. whenever a red car is added to the database that database partition automatically adds it to the list of document ID's for the index entry color red.
+* Reading requires care. Partitions have their own data. Unless you have done something special, there should be no reasons a particular field should only exist in a single partition. This means that you must query and combine reads on all partitions. This approach is called _scatter/gather_
+* This makes read queries on secondary indices quit expensive
+
+### Partitioning Secondary Indexes By Term
+* Rather than have each partition have it's own local index, we can construct a global index that covers data in all partitions.
+* This is called term partitioned, because the term we're looking determins which partition we look at. 
+* Can partition the index by the term itself, or the hash of the the term.
+* Global Secondary indexes make reads more efficient. Rather than scatter/gather over all partitions, we just need to make a request to the partition that has the term we want
+* Downside is that we make writes slower, because we may affect multiple partitions of the index
+
+### Rebalancing Partitions
+* Things change in database: e.g. want more CPU's, disks, RAM, machines fail and require take over
+* These changes require rebalancing. Rebalancing must meet some minimum requirements:
+  * After rebalancing, the load should be share fairly between nodes in the cluster
+  * Database should accept reads and writes while rebalancing
+  * Minimize data movement for to maximize process efficiency
+
+### Strategies for rebalancing
+**How NOT to do it: hash mod N**
+* Changing the number of nodes N, completely changes the mod of the hash, making moves super chaotic/inefficient
+
+**Fixed number of partititons**
+* Simple Strategy. Could have a fixed number of partitions. Partitions make up nodes. Can scale up by creating a new node that "steals" partitions of existing nodes
+* Num of partitions is the max amount of nodes you can have. Shouldn't choose to high a num b/c of associated overhead costs. Too low of a number and you quickly hit a ceiling.
+
+**Dynamic Partitioning**
+
