@@ -423,3 +423,38 @@ A trigger lets you register custom application code that automatically executes 
 * Num of partitions is the max amount of nodes you can have. Shouldn't choose to high a num b/c of associated overhead costs. Too low of a number and you quickly hit a ceiling.
 
 **Dynamic Partitioning**
+* For databases with key range partitioning, a fixed number of partitions with fided boundaries would be very inconvenient. If you get the boundaries wrong, you can get all the data in one partition, with other empty partitions
+* In dynamic partitioning if a partition grows too big, it can be split and vice versa
+* At first when the dataset is small, all writes are handled by a single node until the partition is large enough to be split. This is mitigated by _pre-splitting_ the node on initiation.
+
+**Partitioning proportionally to nodes**
+* make the number of partitions proportional to the node. Have a fixed number of partitions per node
+* the size of each partition grows proportionally to the dataset size while the number of nodes remains unchanged. When you increase the number of nodes, partitions became smaller again. 
+* since larger data volume generally require a larger number of nodes to store, this approach keeps size of each partition fairly stable.
+* Whena new node joins the cluster it randomly chooses a fixed number of partitions to split and takes ownership of half of those split partitions, leaving the other half in place. 
+
+### Operations: Automatic or Manual Rebalancing
+* Gradient exists between manual or automatic rebalancing. Some db systems generate recommendations but require an administrator to commit before it takes effect
+* Automatic rebalancing more convenient, however rebalancing is expensive. Want to minimize operation 
+
+### Request Routing
+* When a client wants to make a request, how does it know which node to connect to? As partitions are rebalanced, assignment of partitions to nodes change. Problem is called _service discovery_
+* Few different approaches to the problem:
+  * Allow the client to contact any node (e.g. via round robin load balancer). Pass along until it hits relevant node.
+  * Send all requests to a routing tier first that handles and forwards accordingly. Acts as a parition-aware load balancer
+  * Require the client to be aware of the relevant node
+* Problem is: how to maintain resolution between component handling partition assignment and partition assignment changes?
+* Many distributed data systems rely on a seprate coordination service called ZooKeeper to keep track of cluser metadata. ZooKeeper maintains authoritative mapping of partitions to nodes. 
+* Some systems use a _gossip protocol_ to talk update each other regarding partitioning assignment. Every node can reroute to requests to the correct node
+
+### Ch 6 Summary
+* We partition data when it is too large to be handled by one machine. The goal is to spread data and load across multiple instances and avoid hot spots
+* Two main approaches to partitioning:
+  * Key Range Partitioning: Keys are sorted and a partition owns all the keys from a min to max. 
+    * Partitions are typically rebalanced by dynamically splitting the range into two subranges when the partitions are too big.
+  * Hash Partitioning: A hash function is applied to each key, and a partition owns a range of hashes. This method destroys the ordering of keys, making range queries inefficient, but this distributes load evenly.
+    * Common to create a fixed number of partitions in advance to assign several partitions to each node and move parittions form one node to another when nodes are added or removed. Dynamic partitioning also used. 
+* Hybrid approaches possible, e.g. with a compound key: one part of key to identify the partition, another for the sort order.
+* A secondary index also needs to be partitioned. There are two methods:
+  * Document partition indexes (local indexes): secondary indexes are stored in the same partition as the primary key and value. This means that only a single partition needs to be udpated on write, but a read of the secondary index requires a scatter/gather across all partitions.
+  * Term-partitioned indeces (global indexes): Secondary indexes are partition seperately, using indexed values. Entry in the secondary idnex may include rcords from all partitions of the primary key. During a write, several partitions must be updated, however reads can be from a single parittion. 
