@@ -458,3 +458,5 @@ A trigger lets you register custom application code that automatically executes 
 * A secondary index also needs to be partitioned. There are two methods:
   * Document partition indexes (local indexes): secondary indexes are stored in the same partition as the primary key and value. This means that only a single partition needs to be udpated on write, but a read of the secondary index requires a scatter/gather across all partitions.
   * Term-partitioned indeces (global indexes): Secondary indexes are partition seperately, using indexed values. Entry in the secondary idnex may include rcords from all partitions of the primary key. During a write, several partitions must be updated, however reads can be from a single parittion. 
+
+## Chapter 7 Transactions

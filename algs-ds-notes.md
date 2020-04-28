@@ -149,3 +149,110 @@ class Solution:
           dp[i] = min(dp[i], dp[i-sq]+1)
   return dp[-1]
 ```
+
+## 198 Houser Robber
+* Key is to use dynamic programming:
+* Base Case is 0
+* Memory optimization available when you realize current value only dependent on the previous value
+
+Solution 1:
+`T: o(n), S: o(n)`
+```python
+class Solution:
+  def rob(self, nums):
+    if not nums: return 0
+    dp = [float('-inf') for _ in range(len(nums)+1)]
+    dp[0], dp[1] = 0, nums[0]
+    for i in range(1, len(nums)):
+      dp[i+1] = max(nums[i] + dp[i-1], dp[i])
+    return dp[-1]
+```
+
+Solution 2:
+`T: o(n), S: o(1)`
+```python
+class Solution:
+  def rob(self, nums):
+  last = now = 0
+  for n in nums:
+    now, last = max(last + n, now), now
+  return now
+```
+
+## 102 Binary Tree Level Order Traversal
+* Key idea is to go through level by level building a new queue out of the previous queue
+Solution:
+`T: o(n), S: o(n)`
+```python
+class Solution:
+  def levelOrder(self, root):
+    if not root: return []
+    res, q = [], [root]
+    while q:
+      res.append([n.val for n in q])
+      leaves = []
+      for n in q:
+        if n.left: leaves.append(n.left)
+        if n.right: leaves.append(n.right)
+      q = leaves
+    return res
+```
+## House Robber III
+* This is a great problem. Let's walk through the solutions from naive -> optimal
+* In the naive solution, we understand that if we choose to rob the root, then we must skip the kid nodes `root.left`, `root.right`, and rob the grandchildren nodes `root.left.left`, `root.left.right`, `root.right.left` and `root.right.right`. We consider both and choose the highest value operation.
+* In the more optimal solution, we realize that in the naive solution there are overlaps in the operations we consider.
+  * e.g. robHelper(root) considers robHelper(root.left.left), but when we call robHelper(root.left.left), it calls robHelper(root.left.left) again! We can use dynamic programming to remember the results of shared operatins
+* In the most optimal solution as we backtrack back up through the tree in our recursive calls, we return the the value of the options to either rob the root or not.
+  * return `res[0]` returns the maximum we can rob if we DON'T rob the root (skipRoot)
+  * return `res[1]` returns the maximum we can rob if we rob the root (robRoot)
+
+Solution 0 (Naive):
+`T: o(n!), S: o(n)`
+```python
+class Solution:
+  def rob(self, root):
+    if not root: return 0
+    val = 0
+    if root.left:
+      val += self.rob(root.left.left) + self.rob(root.left.right)
+    if root.right:
+      val += self.rob(root.right.left) + self.rob(root.right.right)
+
+    return max(root.val + val, self.rob(root.left) + self.rob(root.right))
+```
+
+Solution 1 (More Optimal):
+`T: o(n), S: o(n)`
+```python
+class Solution:
+  def rob(self, root):
+    return self.robHelper(root, {})
+
+  def robHelper(self, root, seen):
+    if not root: return 0
+    if root in seen: return seen[root]
+    val = 0 
+    if root.left:
+      val += self.rob(root.left.left, seen) + self.rob(root.left.right, seen)
+    if root.right:
+      val += self.rob(root.right.left, seen) + self.rob(root.right.right, seen)
+    res = max(root.val + val, self.robHelper(root.left, seen) + self.robHelper(root.right, seen))
+    seen[root] = res
+    return res
+```
+
+Solution 2 (Most Optimal):
+`T: o(n), S: o(1) (if you don't consider recursive stack calls)`
+```python
+class Solution:
+  def rob(self, root):
+    return max(self.robHelper(root))
+
+  def robHelper(self, root):
+    if not root: return [0, 0]
+    left = self.robHelper(root.left)
+    right = self.robHelper(root.right)
+    skipRoot = max(left[0], left[1]) + max(right[0], right[1])
+    robRoot = left[0] + right[0] + root.val
+    return (skipRoot, robRoot)
+```
