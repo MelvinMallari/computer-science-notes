@@ -127,3 +127,25 @@ class Solution:
     return res
 ```
 
+## 279 Perfect Squares
+* Key pattern is dynamic programming
+* Create a dp table across possible squares and values up to n
+* Base case is 0 
+* `T: o(nm), S: o(nm)` solution exist, but was getting TLE so just optimal solution show 
+
+Solution:
+`T: o(nm), S: o(n)`
+`n: input n`
+`m: num perfect squares that fit in n`
+```python
+class Solution:
+  def numSquares(self, n):
+    squares = [i*i for i in range(1, math.floor(n**0.5)+1)]
+    dp = [float('inf') for _ in range(n+1)]
+    dp[0] = 0
+    for sq in squares:
+      for i in range(1, n+1):
+        if i >= sq:
+          dp[i] = min(dp[i], dp[i-sq]+1)
+  return dp[-1]
+```

@@ -423,4 +423,3 @@ A trigger lets you register custom application code that automatically executes 
 * Num of partitions is the max amount of nodes you can have. Shouldn't choose to high a num b/c of associated overhead costs. Too low of a number and you quickly hit a ceiling.
 
 **Dynamic Partitioning**
-
