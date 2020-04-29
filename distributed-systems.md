@@ -460,3 +460,48 @@ A trigger lets you register custom application code that automatically executes 
   * Term-partitioned indeces (global indexes): Secondary indexes are partition seperately, using indexed values. Entry in the secondary idnex may include rcords from all partitions of the primary key. During a write, several partitions must be updated, however reads can be from a single parittion. 
 
 ## Chapter 7 Transactions
+Lots of things can go wrong in data systems:
+* software or hardware can fail at any time (including during a write operation)
+* app may crash at any time (including during series of operations)
+* network interuption can cut off app from database or nodes from each other
+* several clients may write to the database overwritting each other's data
+* client may read partially updated data
+* race conditions between clients can cause surprising bugs
+* system has to be fault tolerant and have mechanisms in place to handle all this. this is hard
+* a _transactions_ is way to group several reads and writes as a logical unit. These are executed as one operation. the transaction either succeeds (commits) or it fails (abort, rollback). If failure the app can safely retry.
+* not every app needs transactions, some benefits can be had from weakening transactional guarantees
+
+### The slippery concept of a transaction
+* Lots of subjective interpretation on the meaning of "ACID" compliant.
+* Systems that do not meet ACID creteria are sometimes called BASE for Basically Availabe Soft state and Eventual Consistency
+* ACID: Atomicity, Consistency, Isolation, Durability
+
+**Atomicity**
+* Atomicity means different things in different contexts in computing
+* In multi-threaded program, an atomic operation is one where the state is either before the operation or after, no in between
+* ACID atomicity descrives what happens if a client wants to make several writes but a fault occurs after some of the writes have been processed.
+* e.g. if a process crashes, network is interrupted, disk becomes full, etc- if the writes are grouped together into an atomic tx and the tx cannot be completed (committed), the the tx is aborted and the db must discard or undo any writes it has made so far in the tx.
+* Can be thought of as abortability (although this isn't the widely accepted word for it)
+
+**Consistency**
+* ACID consistency is the idea that certain _invariants_ about your data must always be true. 
+* If a tx starts with a database that is valid according to these invariants, and any writes during the tx preserves validity, then you can be sure the invariants are always satisfied.
+* However, it is the app's responsibility to define its transactions correctly so that they preserve consistency. This is not something the database can guarantee. 
+* If you write bad data that violate your invariants the database can't stop you. Database can only enforce some basic constraints (uniqueness, foreing key).
+* Letter C doesn't really belong in ACID
+
+**Isolation**
+* _isolation_ means that two concurrently executing transactions are isolated from each other.
+* The classic database textbook formalize isolation as _serializability_, which means that each transaction can pretend that it is the only transaction running on the entire database. 
+* the database ensures that when the transactions are committed, the result is the same as if they had run _serially_ (one after the other)
+
+**Durability**
+* The promise that once a tansaction has committed succesfully any data written will not be forgotten
+* This means writing to nonvolatile storage (disks/ssds), write-ahead-logs. In replicated databases, it may mean data has been copied to some number of nodes.
+* No such thing as perfect durability.
+
+### Single object writes
+* storage engines aim to provide atomicity and isolation on the level of a single object on one node
+* Atomicity can be achieved by using a log for crash recovery and isolation can be implemented using a lock on each object during access.
+
+### Multi object transactions
