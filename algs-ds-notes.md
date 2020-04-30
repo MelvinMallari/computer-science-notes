@@ -197,7 +197,7 @@ class Solution:
       q = leaves
     return res
 ```
-## House Robber III
+## 337 House Robber III
 * This is a great problem. Let's walk through the solutions from naive -> optimal
 * In the naive solution, we understand that if we choose to rob the root, then we must skip the kid nodes `root.left`, `root.right`, and rob the grandchildren nodes `root.left.left`, `root.left.right`, `root.right.left` and `root.right.right`. We consider both and choose the highest value operation.
 * In the more optimal solution, we realize that in the naive solution there are overlaps in the operations we consider.
@@ -255,4 +255,44 @@ class Solution:
     skipRoot = max(left[0], left[1]) + max(right[0], right[1])
     robRoot = left[0] + right[0] + root.val
     return (skipRoot, robRoot)
+```
+
+## 581 Shorted Unsorted Continuous Subarray
+* Key idea is that you loop through the array searching for the lefmost and rightmost numbers that break the sorted invariant
+* Sorted Invariant: any number should be >= than the largest number to its left. any number should be =< than the smallest number to its right. 
+
+**Edge Case**
+* in the case that the array is sorted, then the initial values of `end`, `start` must bound a difference of 0.
+  * Therefore `start, end = -1, -2`
+
+Solution 1 (more readable):
+`T: o(n), S: o(1)`
+```python
+class Solution:
+  def findUnsortedSubarray(self, nums):
+    smallest, largest = float('inf'), float('-inf')
+    start, end = -1, -2
+    for i in range(len(nums)):
+      largest = max(largest, nums[i])
+      if nums[i] < largest: end = i
+    for i in range(len(nums)-1, -1, -1):
+      smallest = min(smallest, nums[i])
+      if nums[i] > smallest: start = i
+    return end - start + 1
+```
+
+Solution 2 (optimal):
+`T: o(n), S: o(1)`
+```python
+class Solution:
+  def findUnsortedSubarray(self, nums):
+    smallest, largest = float('inf'), float('-inf')
+    start, end = -1, -2
+    n = len(nums)
+    for i in range(len(nums)):
+      largest = max(largest, nums[i])
+      smallest = min(smallest, nums[n-i-1])
+      if nums[i] < largest: end = i
+      if nums[n-i-1] > smallest : start = n-i-1
+    return end - start + 1
 ```
