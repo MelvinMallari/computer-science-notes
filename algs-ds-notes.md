@@ -296,3 +296,27 @@ class Solution:
       if nums[n-i-1] > smallest : start = n-i-1
     return end - start + 1
 ```
+
+### 494 Target Sum
+* Use dynamic programming
+* Key is to loop through numbers and sum the different ways we can make up the number if taken as a positive, or negative
+  * if we take num x as negative: `step[y-x] += count[y]`
+  * if we take num x as positive: `step[y+x] += count[y]`
+
+**Base Case**
+the base case is, with no numbers, we can make 0 one way (1)
+
+`T: o(n^2), S: o(n^2), n:len(nums)`
+```python
+class Solution:
+  def findTargetSumWays(self, nums, S):
+    count = collections.defaultdict(int)
+    count[0] = 1 # (1)
+    for x in nums:
+      step = collections.defaultdict(int)
+      for y in count:
+        step[y+x] += count[y]
+        step[y-x] += count[y]
+      count = step
+    return count[S]
+```
