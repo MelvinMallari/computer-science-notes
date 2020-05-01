@@ -505,3 +505,61 @@ Lots of things can go wrong in data systems:
 * Atomicity can be achieved by using a log for crash recovery and isolation can be implemented using a lock on each object during access.
 
 ### Multi object transactions
+* many have abandoned multi-object transactions because they are difficult to implements across partitions
+* They can also get away in some scenarios where high availabiltiy or performance is required. 
+* There are instances when multi object transactions make sense:
+  * when updating forein keys in a relational db, we can make sure references are valid when inserting several records
+  * When updating denormalized data in a document model system
+  * when updating secondary indexes
+* These applications can still be implemented without tx's but error handling becomes more complicated without atomicity and lack of isolation can cause concurrency problems
+
+### Handling errors and aborts
+* If the database is in danger of violating ACID properties, abort the tx right away
+* Unfortunately, some systems abort and don't roll back the entire tx (rails, django ORM)
+* although retrying an aborted tx is a simple and effefctive error handling mechanism, it isn't perfect:
+  * If the write was actually successful, but network cuts before success received by client
+  * if the error due to overload, retrying makes that worse
+  * retry only worth after transient errors (network, isolation, deadlock) not permanent errors
+  * if the tx has third party side effects, don't want multiple retries
+  * if client fails while retrying, tx data is lost
+
+### Weak Isolation Levels
+* Serializable Isolation solves a lot of concurrency issues, but incur performance costs
+* Some dbs choose not to pay those performances costs and implement weak isolation levels despite the harder to understand more subtle bugs they create
+
+**Read Committed**
+* When reading from a db, you will only read data that was committed (no _dirty reads_)
+* When writing from a db, you will only overwrite data that was committed (no _dirty writes_)
+* It is the default setting for Oracle, PGSQL, memsql
+* To prevent dirty writes, db commonly lock the row when writing
+* To prevent dirty reads, simple solution is to also use locks. However this can be slow. Common solution is to remember the old value and new committed value.
+  * reads before the committed tx get the old value, reads after get the new
+* One weakness of this is if data is read in the middle of a batched transaction, the read data would be skewed (_read skew_)
+* There are cases where read skew is unacceptable
+  * making a copy of a database - inconsistent reads become permanent if restored from backup
+  * Analytic queries and integrity checks- common to scan over entire database. If you pickup a read skew during this scan, data won't make sense
+
+### Snapshot Isolation and Repeatable Read
+* Each transaction reads from a _consistent snapshot_ of the database. tx sees all data committed in the db at the start of the tx. 
+* Even if the data is changed by another tx, each tx sees only the old data from that particular point in time
+* very useful for backups and analytic queries. supported by psql, mysql, oracle, sql server
+**How to implement**
+* write locks to prevent dirty writes
+* key principle is _readers never block writers, and writers never block readers_. this allows long running read queries as well as processing writes normally
+* Database must potentially keep sveral different committed versions of an object side by side.
+  * This technique is called _multi-version concurrency control (MVCC)_
+* Snapshot isolation uses sepearate snapshots for an entire tx (as opposed to query for read committed)
+* Whenever a tx writes anything to the db, the data it writes is tagged by the tx ID of the writer
+* Each row has a created_by and optionally a deleted_by field containing the id of the tx that inserted this row into the table
+
+**Visibility Rules**
+* when a tx reads from the db, tx ids are used to decide which objects it can see and which are invisible
+  * at the start of each tx, the db makes a list of all other tx in progress. any writes those tx have made are ignored
+  * any writes made by aborted tx's are ignored
+  * any writes made by txs with a later tx id are ignored 
+  * all other writes are visible to app's queries
+* Put another way an object is visible if both of the following conditions are true
+  * at the time when reader's tx started, the tx that created each object had already committed
+  * the object is not marked for deletion, or if it is, the tx that request deletion had not yet committed at the time when reader's tx started
+* a long running tx using a snapshot for a long time, continuing to read values that (from other tx's POV) have long been overwritten or deleted.
+  By never udpating values in place but instead creating a new version every time a value is changed, the db can provide a consisten snapshot while incurring only a small overhead
