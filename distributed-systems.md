@@ -563,3 +563,53 @@ Lots of things can go wrong in data systems:
   * the object is not marked for deletion, or if it is, the tx that request deletion had not yet committed at the time when reader's tx started
 * a long running tx using a snapshot for a long time, continuing to read values that (from other tx's POV) have long been overwritten or deleted.
   By never udpating values in place but instead creating a new version every time a value is changed, the db can provide a consisten snapshot while incurring only a small overhead
+
+### Preventing Lost Updates
+* the _lost update problem_ can occur when if an applicatin reads some value from the db, modifies it, and writes back the modified value (read-modify write cycle).
+* If two tx's do this concurrently, one of the modifications can be lost (the later write _clobbers_ the earlier write)
+* A variety of solutions have been developed for this common problem:
+
+**Atomic write operations**
+* Atomic operations are usually implemented by taking an exclusive lock on an object when it is read so no other tx can read until the update has been applied.
+
+**Explicit Locking**
+* Can be explicit when starting, ending a tx. e.g. `BEGIN TRANSACTION; ... COMMIT;`
+
+**Automatically detecting lost updates**
+* alternative is to allow them to execute in parallel and, if the transaction manager detects a lost update, abort the transaction and force it to retry its read-modify-write cycle.
+* can perform this check efficiently in conjunction with snapshot isolation
+* great feature because it doesn't require application code to use any special db features
+
+**Compare-and-set**
+* in db's that don't provide tx's, you sometimes find an atomic compare-and-set oepration.
+* Purpose of this operation is to avoid the update to occur only if the content of the page hasn't changed since the user started editing it.
+* if content has changed and no longer matches old content, this update will have no effect.
+
+**Conflict resolution and replication**
+* locks and compare-and-set operations assume there is a single up-to-date copy- not applicable for multi-leader or leaderless configurations
+* a common approach is to allow concurrent writes to create several conflicting versions of a value (known as _siblings_) and use application code or special data structures to merge these versions after the fact
+* atomic operations can work well in a replicated context especially if they are commutative (work in any order), e.g. increment a counter
+* Last Write Wins (LWW) leads to data loss, unfortunately this is the default configuration for many db's
+
+### Write Skew and Phantoms
+* Imagine a situation where two doctors are trying to give up their on call shifts
+  * Alice and Bob both create a transaction where they reschedule their shifts, the transaction's concurrently check that `currently_on_call >= 2`, which returns true for both of their tx's, and th tx's succeeds
+  * This isn't a dirty write or lost update because the tx's update two different objects.
+  * This however has created a race condition
+* write skew happens when different tx's read the same objects, then update some of those objects
+* With write skew, our solutions are more restricted:
+  * atomic single object operations don't help as mltiple objects are involved
+  * automatic detection of lost updates doesn't help here
+  * db constraints may or may not be an option. constraints have to affect multiple objects
+  * if you can't use serializable isolation level, the second-best option is to explicitly lock the rows that transactions dpend on. 
+
+### Phantoms causing write skew
+* Write skew basically happens when the 3 steps happen
+  * A SELECT query checks whether some requirement is satisfied by searching for rows that match some search condition
+  * depending the result of the first query, the app code decides how to continue
+  * if app decides to go ahead, it makes a write to the database and commits the tx. the effect of this write changes the precondition of the decision of step 2. 
+* You can attach a lock to a row that doesn't exist, but if step 1 checks for something that DOESN'T exist you can't
+* The effect where a write in one tx changes the result of a search query in another tx is called a _phantom_.
+* Can artificially introduce a lock object into the database an approach called **materializing conflicts**, because it takes a phantom and turns it into concrete set of rows that can be locked.
+
+### Serializability
