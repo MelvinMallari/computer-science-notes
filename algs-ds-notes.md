@@ -343,3 +343,62 @@ class Solution:
       first, second = first.next, second.next
     return first # or second doesn't matter
 ```
+
+### 72 Edit Distance
+* dynamic programming
+* key idea is that delete, insert and replace represent three different recurisve operations that we can check
+  * We can cache or tabularize the returns of these three different recursive calls
+
+Solution 1 (Naive, top-down solution):
+Time complexity is hard to analyze, but exponential
+```python
+class Solution:
+  def minDistance(self, word1, word2):
+    if not word1 and not word2: return 0
+    if not word1: return len(word2)
+    if not word2: return len(word1)
+    if word1[0] == word2[0]: return self.minDistance(word1[1:], word2[1:])
+    insert = 1 + self.minDistance(word1, word2[1:])
+    delete = 1 + self.minDistance(word1[1:], word2)
+    replace = 1 + self.minDistance(word1[1:], word2[1:])
+    return min(delete, insert, replace)
+```
+
+Solution 2 (Optimal, top-down solution):
+`T: o(mn), S: o(mn), m: len(w1), n: len(w2)`
+```python
+class Solution:
+  def minDistance(self, word1, word2, i=0, j=0, memo={}):
+    if i == len(word1) and j == len(word2): return 0
+    if i == len(word1): return len(word2) - j
+    if j == len(word2): return len(word1) - i
+    if (i, j) not in memo:
+      if word1[i] == word2[j]:
+        res = self.minDistance(word1, word2, i+1, j+1, memo)
+      else:
+        insert = 1 + self.minDistance(word1, word2, i, j+1, memo)
+        delete = 1 + self.minDistance(word1, word2, i+1, j, memo)
+        replace = 1 + self.minDistance(word1, word2, i+1, j+1, memo)
+        res = min(insert, delete, replace)
+      memo[(i, j)] = res
+    return memo[(i, j)]
+```
+
+Solution 3 (Optimal, bottom-up solution):
+```python
+class Solution:
+  def minDistance(self, word1, word2):
+    m, n = len(word1), len(word2)
+    dp = [[0]*(n+1) for _ in range(m+1)]
+    for i in range(m+1):
+      dp[i][0] = i
+    for j in range(n+1):
+      dp[0][j] = j
+    for i in range(1, m+1):
+      for j in range(1, n+1):
+        if word1[i-1] == word2[j-1]:
+          dp[i][j] = dp[i-1][j-1]
+        else:
+          dp[i][j] = 1 + min(dp[i-1][j], dp[i][j-1], dp[i-1][j-1])
+    return dp[-1][-1]
+```
