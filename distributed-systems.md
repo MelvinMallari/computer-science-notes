@@ -613,3 +613,46 @@ Lots of things can go wrong in data systems:
 * Can artificially introduce a lock object into the database an approach called **materializing conflicts**, because it takes a phantom and turns it into concrete set of rows that can be locked.
 
 ### Serializability
+* Lots of problems with race conditions
+  * isolation levels hard to understand and incosistent among different db systems
+  * hard to tell from app code whether it is safe to run a particular isolation level
+  * there are no good tools to help us detect race conditions
+* Solution to all these problems is to use _serializable_ isolation
+* _serializable_ isolation guarantees that even though transactions may execute in parallel the end result will be if they had executed serially
+* To understand why all db's don't implement serializability, we will look at the different implementations
+
+**Actual Serial Execution**
+* The simplest way to avoid concurrency problem is to remove concurrency entirely: execute only one transaction at a time, in serial order, on a single thread.
+* Only recent developments have made this possible, performance-wise:
+  * RAM became cheap enough such that it was feasible to keep an entire dataset in memory
+    * when all the data in the tx needs to access is in memory, tx's can execute much faster than if they had wait for the data to be load in the disk
+  * Database designers realized that OLTP tx's are usually short and only make a small number of reads and writes
+* Approach used by VoltDB/H-Store, Redis and Datomic 
+* Stored procedure: application must send the entire transaction code to the db ahead of time as a _stored procedure_.
+  * This is done to minimize network hops between the app and query processor
+* Pros and cons of stored procedures
+  * Cons:
+    * each db has its own language for stored procedures and they look kinda ugly by modern standards
+    * code running in a db is difficult to debug and manage
+    * db is much more performance sensitive than an app server, badly written stored procedure can cause more trouble
+* serial tx's make concurrency control much simpler, but in this method, the single-threaded tx processor can be a serious bottleneck
+* gains can be made if you partition your data correctly such that multiple cores can have a core dedicated to each partition
+* Summary of serial execution
+  * Every tx must be small and fast- it only takes one slow one to stall all others
+  * limited to use cases where the active dataset can fit in memory
+  * Write throughput must be low enough to be handled in a single cpu core or else txs need to be partition without requiring cross-partition coordination
+  * cross-partition coordination tx's possible, but there is a hard limit on extent that they can be used
+
+**Two-Phase Locking (2PL)**
+* Concurrent reads are allowed on the same object, but as soon as anyone wants to write an object, exclusive access is required
+* if tx A has read an object and tx B wants to write to the object, B must wait for A to commit or abort before it can continue
+* if tx A has written an object and tx B wants to read that object, B must wait until A commits or aborts before it can continue
+* in 2PL writers don't just block other writers, they also block other readers and vice versa
+* Two types of lcok, shared mode or exlusive mode
+  * shared mode: if a tx wants to red an object, it must first acquire the lock in shared mode. several tx are allowed to hold lock in shared mode simultaneously
+    * if another tx already has an exclusive lock on the object these tx must wait
+  * if a tx wants to write, it must acquire the lock in exclusive mode
+  * if a tx first reads and writes an object it may upgrade its shared lock to an exclusive lock
+  * After a tx has acquired the lock it must continue to hold the lock until the end of the tx
+    * first phase: acquire the lock
+    * second phase: release the lock

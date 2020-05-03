@@ -320,3 +320,26 @@ class Solution:
       count = step
     return count[S]
 ```
+
+### 142 Linked List Cycle II
+* use two pointers, a fast and a slow pointer
+* faster pointer skips two nodes, slow pointer skips one.
+* fast pointer either hits the end of the list, in which case there is no cycle, or fast == slow
+* if fast == slow, we've hit the halfway point of the cycle
+* restart the fast pointer to the start of the list, and have the two pointers move at the same pace to find the intersection
+
+Solution
+`T: o(n), S: o(1)`
+```python
+class Solution:
+  def detectCycle(self, head):
+    fast = slow = head
+    while fast:
+      fast, slow = fast.next.next, slow.next
+      if fast == slow: break
+    if not fast or not fast.next: return None # hit end of list w no cycle
+    first, second = head, slow
+    while first != second:
+      first, second = first.next, second.next
+    return first # or second doesn't matter
+```
