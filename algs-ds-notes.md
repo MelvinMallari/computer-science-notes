@@ -385,6 +385,16 @@ class Solution:
 ```
 
 Solution 3 (Optimal, bottom-up solution):
+**Base Case**
+* Base case is if word to transform to is empty, then it would take length of word to edit into empty string
+
+* from the perpective for word1 (which needs to be transformed to word2)
+  * insert: represented by `1 + dp[i-1][j]`
+  * delete: represented by `1 + dp[i][j-1]`
+  * replace: represented by `1 + dp[i-1][j-1]`
+  * match: represented by `dp[i-1][j-1]`
+
+`T: o(mn), S: o(mn), m: len(w1), n: len(w2)`
 ```python
 class Solution:
   def minDistance(self, word1, word2):
@@ -401,4 +411,25 @@ class Solution:
         else:
           dp[i][j] = 1 + min(dp[i-1][j], dp[i][j-1], dp[i-1][j-1])
     return dp[-1][-1]
+```
+
+### 338 Counting Bits
+* dynamic programming
+* Key thing to realize is that you want to fit the largest squares of 2's you can, cache the result for future reference
+* we take offset and continually check if it'll finally fit into the current number we're at
+* otherwise i can be made by the num of 1's it takes from the i-offset + 1
+
+**Base Case**
+* n = 0 requires 0 1's to represent
+
+Solution:
+`T: o(n), S: o(1), n: num`
+```python
+class Solution:
+  def countBits(self, num):
+    res, offset = [0], 1
+    for i in range(1, num+1):
+      if offset*2 == i: offset *= 2
+      res.append(res[i-offset]+1)
+    return res
 ```
