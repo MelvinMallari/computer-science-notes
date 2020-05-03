@@ -656,3 +656,11 @@ Lots of things can go wrong in data systems:
   * After a tx has acquired the lock it must continue to hold the lock until the end of the tx
     * first phase: acquire the lock
     * second phase: release the lock
+* transaction throughput and response times of queries are significantly worse under 2PL thatn under weak isolation
+* this is partly due to overhead of acquiring and releasing all these locks, and mostly due to reduced concurrency
+* deadlock: condition where a set of processes have requests for resources that cannot be satisfied
+* deadlocks happen more frequently in a 2PL system- increasing overhead cause have to retry 
+* predicate locks: locks on objects that much a certain condition
+* predicate locks prevent effects of _phantoms_
+* unfortunately, predicate locks do not perform well. if lot of locks by active tx- can be time consuming to check for matching locks
+* _idnex range locking_ instead relaxing relaxes a predicate to match a greater set of objects, reducing the overhead of checking for matching locks
