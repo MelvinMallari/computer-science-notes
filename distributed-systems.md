@@ -664,3 +664,34 @@ Lots of things can go wrong in data systems:
 * predicate locks prevent effects of _phantoms_
 * unfortunately, predicate locks do not perform well. if lot of locks by active tx- can be time consuming to check for matching locks
 * _index range locking_ instead relaxing relaxes a predicate to match a greater set of objects, reducing the overhead of checking for matching locks
+
+### Serializable Snapshot Isolation (SSI)
+* SSI is fairly new but promises to be a good compromise with performance and serializability
+* pessismistic vs optimistic concurrency control
+  * Two-phase locking based on principle that if anything might go wrong, better to wait until situation is safe again
+  * Serial execution is pessimistic to the extreme
+  * SSI is a optimistic concurrency control technique. instead of blocking if something potentially dangerous happens, tx continue anyway.
+    * when a tx wants to commit, the db checks weather anything bad happened. if so, it is aborted and retried.
+    * optimistic concurrency control has better performance if system has spare throughput bandwidth, otherwise retries make things worse
+* possible in snapshot isolation that premise of query changes before tx committed. How does a db know if a query result might have changed?
+  * detecting reads of a stale MVCC object version
+    * to prevent this from happening, db needs to track when a tx ignores another tx's writes due to MVCC visibility rules.
+    * when tx wants to commit, db checks whether any of the ignore writes have now been committed, if so abort.
+  * detecting writes that affect prior reads (write occurs after the read)
+    * when tx writes to db, it must look in the indexes for any other tx that have recently read the affected data. 
+    * lock acts like a tripwire notifying the tx's that the dat they read may no longer be up to date. 
+* performance tradeoff b/w read/write tracking granularity overhead and num tx's abort occurrences.
+* In some cases doesn't matter if the query premise has changed, tx is serializable anyways
+* compared two 2PL big advantage of SSI is that reads don't block writes and vice versa
+  * read writes are non-blocking at all
+* Compared to serial execution, SSI isn't limited to a single thread
+* long running tx's more likely to be aborted, so favors shorter ones
+
+### ch 7 Summary
+* transactions are an abstraction layer that allow apps to pretend certain concurrency problems don't exists
+* without tx's various error scenarios (crashes, network interruption, power outages) mean that data can become insonsistent in various ways
+* dirty reads: one client reads another client's writes before they have been committed.
+* dirty writes: one client overwrites data that another client has written, but not yet committed
+* read skew: client sees different parts of the database at different points in time. most commony addressed w/ snapshot isolation
+....
+
