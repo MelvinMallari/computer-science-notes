@@ -433,3 +433,22 @@ class Solution:
       res.append(res[i-offset]+1)
     return res
 ```
+
+### 14 Longest Common Prefix
+* first, find the shortest word
+* then compare each to every ch in the shortest word
+* if there is a mismatch, return the matches up til the mismatches
+* if not mismatches return the whole word
+Solution:
+`T: o(mn), S: o(m) m: length of shortest word, n: `
+```python
+class Solution:
+  def longestCommonPrefix(self, strs):
+    if not strs: return ""
+    shortest = min(strs, key=len)
+    for i, ch in enumerate(shortest):
+      for s in strs:
+        if s[i] != ch:
+          return shortest[:i]
+    return shortest
+```
