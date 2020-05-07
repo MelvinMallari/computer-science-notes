@@ -695,3 +695,8 @@ Lots of things can go wrong in data systems:
 * read skew: client sees different parts of the database at different points in time. most commony addressed w/ snapshot isolation
 ....
 
+## ch 8 The Trouble with Distributed Systems
+
+### Unreliable Networks
+* 
+
