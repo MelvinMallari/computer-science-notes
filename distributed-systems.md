@@ -698,5 +698,21 @@ Lots of things can go wrong in data systems:
 ## ch 8 The Trouble with Distributed Systems
 
 ### Unreliable Networks
-* 
+* requests can be interrupted an any point in the send-receive cycle, for a variety of inane reasons 
+* there is a balanced tradeoff between waiting too long for a response and cutting off too many lagged responses
+* networks can become "congested" when a large amount packets are queued up to be processed
+
+**TCP vs UDP**
+* Latency sensitive applications (VoIP) use UDP over TCP
+* TCP vs UDP is a tradeoff between reliability and variability
+* UDP is good in situations where delayed data is worthless
+* TCP is good in situations where you cannot have data loss
+
+### Synchronous vs Asynchronous Networks
+* circuit-switched networks are syncronous - think landline calls
+* packet based networks are asyncronous
+* Syncronous networks are statically partitions and therefore can have guaranteed throughputs
+  * This comes at the cost of network utilization
+* Asyncronous networks have high network utilization- packets jossle for bandwidth
+  * This comes at a cost of guaranteed throughput
 
