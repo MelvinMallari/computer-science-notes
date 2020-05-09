@@ -739,4 +739,69 @@ Lots of things can go wrong in data systems:
 * An emerging idea is to treat GC pauses like brief planned outages of a node and let other nodes handle requests from clients while one node is collecting its garbage
 
 ### Knowledge, Truth, and Lies
-* 
+* a node in a network cannot know anything forsure, it can only make guesses based on messages it receives
+* in distributed systems, we can make assumptions about the behaviour (the _system model_) and design the system according to those assumptions
+
+### The truth is defined my the majority
+* a node is declared dead by a majority, even if it is alive (responses not heard, GC pausing threads etc)
+* frequently a system requires there to be only one of something (one leader, one username)
+  * it is possible that, say during a GC pause, a node doesn't know it's no longer the leader, proceeds with a write, and corrupts data
+* Problem above can be solved with _fencing tokens_ in which leaders have an incrementing token id, and any writes with a stale token is rejected
+
+### Byzantine Faults
+* distributed systems become much harder when we can no longer assume that nodes are being honest (e.g. bad actors)
+
+**Byzantine Generals Problem**
+* There are n generals who need to agree, and their endeavor is hampered by the fact that there are some traitors in their midsts.
+* Most of the generals are loyal and saend truthful messages, but traitors may try to deceit or confuse others by sending fake or untrue messages.
+
+* A system is _Byzantine fault-tolerant_ if it continues to operate correctly even if some of the nodes are malfunctioning and not obeying protocol.
+  * e.g. aerospace where some sensors may be compromised due to radiation
+  * blockchain systems where there are bad actors
+
+* in web systems we usually do not need this level of fault tolerance
+* we can however card against weak forms of lying easily:
+  * corrupted network packets
+  * sanity checking of values
+  * syncing multiple NTP clients to cross-check their responses
+
+### System Model and Reality
+* system models are abstractions that describe what things an algorithm may assume. Three common ones:
+  * Synchronous model
+    * assumes bounded network delay, process pauses, clock error. Meaning none of those things exceed some upper limit. 
+    * not a very realistic model because unbounded delays and pauses occurr
+  * Partial synchronous model
+    * behaves like a synchronous system most of the time, but sometimes exceeds bounds
+    * a realistic model because most things happen on time and sometimes not
+  * Asyncronous Model
+    * algorithms are not allowed to have any timing assumptions. Does not even have a clock (so no timeouts)
+* Types of node failures:
+  * crash-stop-fault: nodes can only fail by crashing. once it stops responding, it's gone forever.
+  * crash-recovery fault: node may crash at any moment and come back at some unknown time
+  * Byzantine (arbitrary) faults: nodes can do anything, including tricking and deceiving other nodes
+
+* to define and algorithm as correct, we can describe its properties. e.g.
+  * uniqueness: no two req for a fencing token may return the same value
+  * monotonic sequence: sequences have to be incremental
+  * availability: a node that requests a fencing token and does not crash eventually receives a response
+* safety: nothing bad happens
+  * if a safety property is violated, we can point to a particular point in time which it was broken
+* liveness: something good eventually happens
+  * may not hold at some point in time, but there is hope it may be satisfied in the future
+* theoretical abtract models are sometimes wrong, but are useful to reason about systems (otherwise there's no ground to stand)
+
+### Summary
+* There are lots of things that can go wrong in a distributed system. partial failures are the defining characteristic of distributed systems
+* to tolerate faults is to first detect them, but even this is hard:
+  * no accurate way to determine this, so most systems use timeouts
+  * timeouts can't distinguish a dead node from network issues
+  * nodes may become _limp_: their connection is alive but constrained to an incredibly low speed.
+* Once a fault is detected making a system to tolerate it is not easy either:
+  * no global variable, shared memory or common knowledge or shared state- nodes can't even agree on time
+  * only way to communicate is over a unreliable network
+  * nodes much reach a quorum for major decisions
+* Scalability, fault tolerance and low latency is why we deal with all this
+
+
+
+

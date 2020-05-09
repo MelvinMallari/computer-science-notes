@@ -557,3 +557,31 @@ class Solution:
         if not self.unitValid(square): return False
     return True
 ```
+
+### 44 Wildcard Matching
+* dynamic programming
+* Two key ideas for the state equation:
+  * if `dp[i][j] == '.' or p[j-1] == s[i-1]` both represent a match
+    * in this case `dp[i][j] = dp[i-1][j-1]`
+  * if `p[j-1] == '*'` there are two possible cases that could be true
+    * the word up til the wildcard operator was already a match. '*' doesn't not include the current character
+      * this cases is represented by `dp[i][j-1]`
+    * the current letter is represented by a previously called wild card operator. '*' does include the current character
+      * this case is represented by `dp[i-1][j]`
+
+`T: o(mn), S:o(mn). m: len(p) n:len(s)`
+```python
+class Solution:
+  def isMatch(self, s, p):
+    dp = [[False]*(len(p)+1) for _ in range(len(s)+1)]
+    dp[0][0] = True
+    for j in range(1, len(p)+1):
+      if p[j-1] == '*': dp[0][j] = dp[0][j-1]
+    for i in range(1, len(s)+1):
+      for j in range(1, len(p)+1):
+        if p[j-1] == '?' or s[i-1] == p[j-1]:
+          dp[i][j] = dp[i-1][j-1]
+        elif p[j-1] == '*':
+          dp[i][j] = dp[i-1][j] or dp[i][j-1]
+    return dp[-1][-1]
+```
