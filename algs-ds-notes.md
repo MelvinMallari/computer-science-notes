@@ -500,3 +500,60 @@ class Solution:
       n -= 1
       i -= 1
 ```
+
+### 7 Reverse Integer
+* Key idea is to modulo the number by 10 to get the 1's number
+* add the modulo to the result
+* multiply the result by 10 to shift the number's up to make place for the one's digit
+* only shift the numbers up if there's more to modulo
+* account for negative numbers by having a `sign` variable that's negative if the initial num negative
+
+
+Solution
+`T: o(n), S: o(1), n: num digits in number`
+```python
+class Solution:
+  def reverse(self, x):
+    sign = 1 if x > 0 else -1
+    res, x = 0, abs(x)
+    while x > 0:
+      res += x % 10
+      if x >= 10: res *= 10
+      x //= 10
+    return res*sign if -2**31 < res*sign < 2**31+1 else 0
+```
+
+### 36 Valid Sudoku
+* Need to check that all rows and all cols and all 3x3 squares are valid
+* we'll define "unit" as a row or col or square.
+* a unit is valid when ther are no repeats in each unit
+
+
+Solution:
+`T:o(n) S:o(1), n: num elements in sudoku`
+```python
+class Solution:
+  def isValidSudoku(self, board):
+    return self.rowsValid(board) and self.colsValid(board) and self.squaresValid(board)
+
+  def unitValid(self, unit):
+    unit = [i for i in unit if i != '.']
+    return len(set(unit)) == len(unit)
+
+  def rowsValid(self, board):
+    for row in board:
+      if not self.unitValid(row): return False
+    return True
+
+  def colsValid(self, board):
+    for cols in zip(*board):
+      if not self.unitValid(cols): return False
+    return True
+  
+  def squaresValid(self, board):
+    for i in (0, 3, 6):
+      for j in (0, 3, 6):
+        square = [board[x][y] for x in range(i, i+3) for y in range(j, j+3)]
+        if not self.unitValid(square): return False
+    return True
+```

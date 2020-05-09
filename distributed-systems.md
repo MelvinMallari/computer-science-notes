@@ -716,3 +716,27 @@ Lots of things can go wrong in data systems:
 * Asyncronous networks have high network utilization- packets jossle for bandwidth
   * This comes at a cost of guaranteed throughput
 
+### Unreliable Clocks
+* Applications depend on clocks in various ways like:
+  * has this request timed out yet?
+  * 99th percentle response time?
+**Monotonic Versus Time of Day clock**
+* time of day clock: returns the current date and time acording to some calendar- usually syncronized with Network Time Protocol NTP
+* monotonic clock: suitable for measuring a duration of time (time interval)- here the difference matters
+* Monotonic clocks don't need sync, but time-of-day clocks need to set according to an external time source or bad things start to happen
+
+### Relying on Synchronized Clocks
+* If you have software that relies on clock synchronization, it is essential to montiro the clock offsets bw all machines and declare off nodes dead. 
+* Can't rely on timestamps for the ordering of events, bc if there is drift the clocks are off wrt each other. Who the last write is then subjective
+* Clock readings could have a confidence interval [earliest, lastest]
+
+### Process Pauses
+* One way a node knows that it is still a leader is by obtaining a _lease_ from the other nodes (similar to a lock)
+* Node runs code to check if it still has a lease to process a request. If within a time buffer of lease expiration- run the code
+  * Problem with this is if there is an unexpected pause in the execution of the program (thread stops for say 15 seconds and you have a 10 second buffer)
+    * The thread being paused for a significant portion of time is not an uncommon or impossible event
+  * In this case, another node may be the leader. Since the thread is paused, nobody told the previous leader. It may process a future request unsafely.
+* An emerging idea is to treat GC pauses like brief planned outages of a node and let other nodes handle requests from clients while one node is collecting its garbage
+
+### Knowledge, Truth, and Lies
+* 
