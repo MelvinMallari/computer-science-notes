@@ -627,3 +627,21 @@ class Solution:
           dp[l][r] = max(dp[l][r], dp[l][i] + nums[l]*nums[i]*nums[r] + dp[i][r])
     return dp[0][n-1]
 ```
+## 28 Implement strStr()
+* loop through and check for substrs to see if they match the needle
+
+**edge case**
+* if the needle matches the last n letters in the haystack, this must be accounted for in the loop
+  * off by 1 error
+
+Solution:
+`T:o(n) S:o(1)`
+```python
+class Solution:
+  def strStr(self, haystack, needle):
+    if not needle: return 0
+    m, n = len(haystack), len(needle)
+    for i in range(m-n+1):
+      if haystack[i:i+n] == needle: return i
+    return -1
+```
