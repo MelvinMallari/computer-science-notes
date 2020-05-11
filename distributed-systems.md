@@ -800,7 +800,7 @@ Lots of things can go wrong in data systems:
   * no global variable, shared memory or common knowledge or shared state- nodes can't even agree on time
   * only way to communicate is over a unreliable network
   * nodes much reach a quorum for major decisions
-* Scalability, fault tolerance and low latency is why we deal with all this
+* Scalability, fault tolerance and low latency is why we deal with the mess of distributed systems
 
 
 

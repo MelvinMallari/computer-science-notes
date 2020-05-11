@@ -297,7 +297,7 @@ class Solution:
     return end - start + 1
 ```
 
-### 494 Target Sum
+## 494 Target Sum
 * Use dynamic programming
 * Key is to loop through numbers and sum the different ways we can make up the number if taken as a positive, or negative
   * if we take num x as negative: `step[y-x] += count[y]`
@@ -321,7 +321,7 @@ class Solution:
     return count[S]
 ```
 
-### 142 Linked List Cycle II
+## 142 Linked List Cycle II
 * use two pointers, a fast and a slow pointer
 * faster pointer skips two nodes, slow pointer skips one.
 * fast pointer either hits the end of the list, in which case there is no cycle, or fast == slow
@@ -344,7 +344,7 @@ class Solution:
     return first # or second doesn't matter
 ```
 
-### 72 Edit Distance
+## 72 Edit Distance
 * dynamic programming
 * key idea is that delete, insert and replace represent three different recurisve operations that we can check
   * We can cache or tabularize the returns of these three different recursive calls
@@ -413,7 +413,7 @@ class Solution:
     return dp[-1][-1]
 ```
 
-### 338 Counting Bits
+## 338 Counting Bits
 * dynamic programming
 * Key thing to realize is that you want to fit the largest squares of 2's you can, cache the result for future reference
 * we take offset and continually check if it'll finally fit into the current number we're at
@@ -434,7 +434,7 @@ class Solution:
     return res
 ```
 
-### 14 Longest Common Prefix
+## 14 Longest Common Prefix
 * first, find the shortest word
 * then compare each to every ch in the shortest word
 * if there is a mismatch, return the matches up til the mismatches
@@ -453,7 +453,7 @@ class Solution:
     return shortest
 ```
 
-### 26 Remove Duplicates from Array
+## 26 Remove Duplicates from Array
 * Key algorithm is often involved with skipping duplicates in an array
   * `if i < len(nums) - 1 and nums[i] == nums[i+1]: continue`
   * `if i > 0 and nums[i] == nums[i-1]: continue`
@@ -471,7 +471,7 @@ class Solution:
     return i
 ```
 
-### 88 Merge Sorted Array
+## 88 Merge Sorted Array
 * Variation of merge sort merging algorithm
 
 
@@ -501,7 +501,7 @@ class Solution:
       i -= 1
 ```
 
-### 7 Reverse Integer
+## 7 Reverse Integer
 * Key idea is to modulo the number by 10 to get the 1's number
 * add the modulo to the result
 * multiply the result by 10 to shift the number's up to make place for the one's digit
@@ -523,7 +523,7 @@ class Solution:
     return res*sign if -2**31 < res*sign < 2**31+1 else 0
 ```
 
-### 36 Valid Sudoku
+## 36 Valid Sudoku
 * Need to check that all rows and all cols and all 3x3 squares are valid
 * we'll define "unit" as a row or col or square.
 * a unit is valid when ther are no repeats in each unit
@@ -558,7 +558,7 @@ class Solution:
     return True
 ```
 
-### 44 Wildcard Matching
+## 44 Wildcard Matching
 * dynamic programming
 * Two key ideas for the state equation:
   * if `dp[i][j] == '.' or p[j-1] == s[i-1]` both represent a match
@@ -584,4 +584,46 @@ class Solution:
         elif p[j-1] == '*':
           dp[i][j] = dp[i-1][j] or dp[i][j-1]
     return dp[-1][-1]
+```
+
+## 312 Burst Balloons
+* dynamic programming
+* we want to loop through all possible gap sizes from (2 -> n)
+  * reason we pick 2 as a starting point is that's the min size of a non-inclusive borders 
+  * e.g. 0, 1, 2 -> (0, 2 bound 1)
+* as we loop through the gap sizes we cache the optimal solution for that particular gap and slice of array
+* state equation:
+  ```python
+    dp[l][r] = max(dp[l][r], dp[l][i] + nums[l]*nums[i]*nums[r] + dp[i][r])
+  ```
+  * we do `nums[l]*nums[i]*nums[r]` because we've cached the optimal solution from l -> i and i -> r
+  * in this case we've popped the balloons in the middle and now want to cache the result from l -> r
+
+
+Solution 1 (Top Down):
+`T: o(n^3), S: o(n^3)`
+```python
+class Solution:
+  def maxCoins(self, nums):
+    nums, memo = [1] + nums + [1], {}
+    def dp(l, r):
+      if l + 1 == r: return 0
+      if (l, r) not in memo:
+        memo[(l, r)] = max(dp(l, i) + nums[l]*nums[i]*nums[r] + dp(i, r) for i in range(l+1, r))
+      return memo[(l, r)]
+    return dp(0, len(nums)-1)
+```
+
+Solution 2 (Bottom Up):
+```python
+class Solution:
+  def maxCoins(self, nums):
+    nums, n = [1] + nums + [1], len(nums) + 2
+    dp = [[0]*n for _ in range(n)]
+    for gap in range(2, n):
+      for l in range(0, n-gap):
+        r = l + gap
+        for i in range(l+1, r):
+          dp[l][r] = max(dp[l][r], dp[l][i] + nums[l]*nums[i]*nums[r] + dp[i][r])
+    return dp[0][n-1]
 ```
