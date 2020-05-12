@@ -802,6 +802,14 @@ Lots of things can go wrong in data systems:
   * nodes much reach a quorum for major decisions
 * Scalability, fault tolerance and low latency is why we deal with the mess of distributed systems
 
+### Chapter 9 Consistency and Consensus
+* best way to build fault-tolerant systems is to find some general-purpose abstractions with useful guarantees, implement them once and let app rely on those guarantees
+* One of the strongest consistency models in _linearizability_
+* linearizability is a _recency guarantee_. Basic idea is to make a system appear as if there were only one copy of data and all operations on it are atomic
+* linearizability vs serializability: in linearizability, order matters. serializability is where things must come in order, but any order can work. 
+* where is linearizability useful? 
+  * consistency on who is the leader
+  * consistency on constraints and uniqueness (e.g. who has a username?)
+  * cross-channel timing depencies: when two services have rely on a consistent state, no race conditions
 
-
-
+### Implmenting a Linearizable System

@@ -645,3 +645,64 @@ class Solution:
       if haystack[i:i+n] == needle: return i
     return -1
 ```
+
+## 13 Roman to Integer
+* Idea is to loop through the array backwards, if we run into a value that's less than previous we subtract rather than add
+Solution:
+`T:o(n) S:o(1)`
+```python
+class Solution:
+  def romanToInt(self, s):
+    mapping = {'I':1,'V':5,'X':10,'L':50,'C':100,'D':500,'M':1000} 
+    res = prev = 0
+    for ch in s[::-1]:
+      curr = mapping[ch]
+      if curr >= prev:
+        res += curr
+      else:
+        res -= curr
+      prev = curr
+    return res
+
+```
+
+## 91 Decode Ways
+* dynamic programming
+* state equations:
+  * `if 0 < int(s[i-1:i]): dp[i] += dp[i-1]` represents a match of number within [1, 9]
+  * `if 10 <= int(s[i-2:i]) <= 26: tmpCurr += prev` represents a match of number within [10, 16]
+
+**Base Case**
+* `dp[0] = 1` case where there is a single match gives one possibility
+
+**Edge Case**
+* when `s == '' or s[0] == 0`  then there are no possible matches
+
+Solution 1 (non-optimal space):
+`T: o(n) S: o(n) n: len(nums)`
+```python
+class Solution:
+  def numDecodings(self, s):
+    if not s or s[0] == '0': return 0
+    dp = [0]*(len(s)+1)
+    dp[0:2] = [1,1]
+    for i in range(2, len(s)+1):
+      if 0 < int(s[i-1:i]): dp[i] += dp[i-1]
+      if 10 <= int(s[i-2:i]) <= 26: dp[i] += dp[i-2]
+    return dp[-1]
+```
+
+Solution 2 (optimal space/time):
+`T: o(n) S: o(1) n: len(nums)`
+```python
+class Solution:
+  def numDecodings(self, s):
+    if not s or s[0] == '0': return 0
+    prev = curr = 1
+    for i in range(2, len(s)+1):
+      tmpCurr = 0
+      if 0 < int(s[i-1:i]): tmpCurr += curr
+      if 10 <= int(s[i-2:i]) <= 26: tmpCurr += prev
+      curr, prev = tmpCurr, curr
+    return curr
+```
