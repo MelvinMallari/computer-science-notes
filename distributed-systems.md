@@ -813,3 +813,35 @@ Lots of things can go wrong in data systems:
   * cross-channel timing depencies: when two services have rely on a consistent state, no race conditions
 
 ### Implmenting a Linearizable System
+* Lets consider systems and see if they can be made linearizable.
+  * Single-leader replication (potentially linearizable)
+    * if you make reads from a leader or synchronously updated followers, they have the potential to be linearizable.
+    * not every single-leader db is actualy linearizable either by design (SSI) or due to concurrency bugs
+    * this requires that we know who the leader is- remember problems with this
+  * Consensus Algorithms (linearizable)
+    * contain measures to prevent split brain, this is how zookeeper and etcd work
+  * multi-leader replication (not linearizable)
+    * not linearizable bc they concurrently process writes on multiple nodes and asynchronously replicate them to other nodes
+    * for this reason can produce conflicting writes that requires resolution
+  * Leaderless Replication (probably not linearizable)
+    * it's possible to have non-linearizable reads even with quorum 
+
+### The Cost of Linearizability
+* CAP theorem: Consistency, Availability, Partition - choose three
+  * if your app _requires_ linearizability, and some replicas are disconnected from others due to a network problem then they are _unavailable_ until issue fixed
+  * if your app does not require linearizability, then the app can remain available in the face of a network problem, but not linearizable
+  * Misnomer because you _have_ to pick Partition, because partition tolerance _is_ a type of fault.
+  * probably better named _either consistent or available when partitioned_
+* Often we make the tradeoff of availability over consistency within hardware (like RAM) for performance reasons
+
+### Ordering guarantees
+* Ordering is very important in distributed systems. There's a deep connection bw ordering, linearizability and consensus.
+
+### Ordering and causality
+* Causality imposes an ordering of events, cause must come before effect (e.g. question before answer, send before receive)
+* _causal order_ is not _total order_
+  * Linearizability: has total order of operations. for any two operations we can always say which one happened first
+  * Causality: has partial ordering. Two events are ordered if they are causally related, but are incomparable if they are concurrent.
+    * some operations are ordered with respect to each other, but others are incomparable
+* according to these definitions, there are no concurrent operations in a linearizable data store.
+* There must be a single timeline along which all operations are totally ordered. Concurrency means that the timeline branches and merges again. 

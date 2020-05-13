@@ -706,3 +706,17 @@ class Solution:
       curr, prev = tmpCurr, curr
     return curr
 ```
+
+### 122 Best time to buy and sell stock ii
+* peak and valley algorithm
+
+class Solutiion:
+`T: o(n), s: o(1) n = len(prices)`
+```python
+class Solution:
+  def maxProfit(self, prices):
+    res = 0
+    for i in range(len(prices)-1):
+      if prices[i+1] > prices[i]: res += prices[i+1]-prices[i]
+    return res
+```
