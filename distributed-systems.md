@@ -845,3 +845,12 @@ Lots of things can go wrong in data systems:
     * some operations are ordered with respect to each other, but others are incomparable
 * according to these definitions, there are no concurrent operations in a linearizable data store.
 * There must be a single timeline along which all operations are totally ordered. Concurrency means that the timeline branches and merges again. 
+* linearizability implies causal order
+* linearizability has signifcant performance costs. But you don't need linearizability to achieve causal order.
+* Causal Consistency is the strongest guarantee you can have while remaining available during network faults
+* to determine causal dependencies, we need some way of describing the "knowledge" of the system
+  * in order to achieve this, the db needs to know which version of the data was read by the application
+
+### Sequence Number Ordering
+* we need not require the significant performance overhead of tracking all data that has been read. Instead we can use _sequence numbers_ or _timestamps_ to order events.
+* 
