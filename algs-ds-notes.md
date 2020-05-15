@@ -720,3 +720,92 @@ class Solution:
       if prices[i+1] > prices[i]: res += prices[i+1]-prices[i]
     return res
 ```
+
+### 38 Count and Say
+* Loop through n-1 and count it up
+
+class Solution:
+`T: o(n^2?), s: o(1) hard to reason`
+```python
+class Solution:
+  def countAndSay(self, n):
+    s = '1'
+    for _ in range(n-1):
+      curr, tmp,  count = s[0], '', 1
+      for i in range(1, len(s)):
+        if s[i] == curr:
+          count += 1
+        else:
+          tmp += str(count) + curr
+          curr = s[i]
+          count = 1
+      tmp += str(count) + curr
+      s = tmp
+    return s
+```
+
+### 66 Plus One
+* Loop through the array backwards, turn the 9's into zeros. If we reach the end of the array, append a 1 to the beginning
+
+Solution:
+`T: o(n), s: o(1) n: len(digits)`
+```python
+class Solution:
+  def plusOne(self, digits):
+    for i in range(len(digits)-1, -1, -1):
+      if digits[i] != 9:
+        digits[i] += 1
+        return digits
+      digits[i] = 0
+    return [1] + digits
+```
+
+### 144 Binary Tree Preorder Traversal
+`T: o(n), s: o(n) n: num nodes`
+```python
+class Solution:
+  def preorderTraversal(self, root):
+    if not root: return
+    res, stack = [], [root]
+    while stack:
+      node = stack.pop()
+      res.append(node.val)
+      if node.right: stack.append(node.right)
+      if node.left: stack.append(node.left)
+    return res
+```
+
+### 103 Binary Tree Zig Zag Level Order Traversal
+Solution I came up with:
+`T: o(n), s: o(n) n: num nodes`
+```python
+class Solution:
+  def zigzagLevelOrder(self, root):
+    if not root: return []
+    res, level, counter = [], [root], 0
+    while level:
+      leaves = []
+      if counter % 2 == 0:
+        res.append(n.val for n in level)
+      else:
+        res.append(n.val for n in level[::-1])
+      for n in level:
+        if n.left: leaves.append(n.left)
+        if n.right: leaves.append(n.right)
+      level = leaves
+      counter += 1
+    return res
+```
+Fancy Solution I did not come up with:
+```python
+class Solution:
+  def zigzagLevelOrder(self, root):
+    if not root: return []
+    res, level, direction = [], [root], 1
+    while level:
+      res.append(n.val for n in level[::direction])
+      leaves = [kid for n in level for kid in (n.left, n.right) if kid]
+      level = leaves
+      direction *= -1
+    return res
+```
