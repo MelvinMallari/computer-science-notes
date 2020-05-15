@@ -853,4 +853,28 @@ Lots of things can go wrong in data systems:
 
 ### Sequence Number Ordering
 * we need not require the significant performance overhead of tracking all data that has been read. Instead we can use _sequence numbers_ or _timestamps_ to order events.
-* 
+* In lamport timestamps, each node has a unique identifier and each node keeps a counter of the number of operations it has processed. (counter, nodeID)
+* every node keeps track of the maximum counter value it has seen so far and includes the maximum on every request
+* when a node receives a request of response with a maximum counter value greater than its own counter value, it immediately increases its own counter to that maximum
+* Although Lamport timestamps define a total order of operations that is consistennt with causality, they are not sufficient to solve many distributed systems problems
+* use of latest lamport stacks is a useful solutiong _after_ the fact. it is not sufficient when a node has just received a request from a user to create a username and needs to decide _right now_
+* Moreover this algorithm is does not allow _availability_
+
+### Total Order Broadcast
+* A single-leader replication determines a total order of operatiosn by choosing one node as a leader and sequencing all operations on a single CPU core on the leader
+* Challenge is to scale system if throughput greater than single leader capability and how to handle failover. This is known as _total order broadcast_ or _atomic broadcast_
+* Total Order Broadcast: a protocol for exchanging messages between nodes:
+  * Reliable Delivery: No messages are lost. Delivery to one node is delivery to all
+  * Totally Ordered Delivery: Messages delivered to every node in same order
+  * This is exactly what you need for replication
+* Another way of looking at total order broadcast is that it is a way of creating a log (like a replication, transaction or write-ahead log)
+  * Delivering messages is like appending to the log
+  * all nodes must deliver teh same messages in same order, all nodes can read the log and see the same sequences of messages
+* TOB is useful for implementing a lock service (fencing tokens)
+
+### Distributed Transactions and Consensus
+* Consensus is important for things like _leader election_ or _atomic commits_
+* atomic commit problem: have to get all nodes to agree on outcome of transaction: either all committ or rollback.
+* the FLP result is a proof that consensus between nodes cannot be reached only within a very restrictive systems model (cannot use clocks or timeouts)
+
+### Atomic Commit and Two-Phase Commit (2PC)
