@@ -707,7 +707,7 @@ class Solution:
     return curr
 ```
 
-### 122 Best time to buy and sell stock ii
+## 122 Best time to buy and sell stock ii
 * peak and valley algorithm
 
 class Solutiion:
@@ -721,7 +721,7 @@ class Solution:
     return res
 ```
 
-### 38 Count and Say
+## 38 Count and Say
 * Loop through n-1 and count it up
 
 class Solution:
@@ -744,7 +744,7 @@ class Solution:
     return s
 ```
 
-### 66 Plus One
+## 66 Plus One
 * Loop through the array backwards, turn the 9's into zeros. If we reach the end of the array, append a 1 to the beginning
 
 Solution:
@@ -808,4 +808,73 @@ class Solution:
       level = leaves
       direction *= -1
     return res
+```
+
+## 116 Populating Next Right Pointers in Each Node
+* We want to traverse through starting through the left most nodes and make our way to the right
+
+Solution:
+`T:o(n), s:o(1). n: num nodes in tree`
+```python
+class Solution:
+  def connect(self, root):
+    curr = root
+    while curr and curr.left:
+      tmp = curr
+      while tmp:
+        tmp.left.next = tmp.right
+        if tmp.next: tmp.right.next = tmp.next.left
+        tmp = tmp.next
+      curr = curr.left
+    return root
+```
+
+## 680 Valid Palindrome II
+* Use two pointers moving towards each other. If we find a mismatch, delete either and check if you can make a palindrome.
+* You can just letters between left and right pointer, because you've confirmed matches outside of them
+Solution:
+`T:o(n), s:o(1). n: num nodes in tree`
+``
+```python
+class Solution:
+  def validPalindrome(self, s):
+    l, r = 0, len(s)-1
+    while l < r:
+      if s[l] != s[r]:
+        dL, dR = s[l:r], s[l+1:r+1]
+        return dl == dl[::-1] or dR == dR[::-1]
+      l += 1
+      r -= 1
+    return True
+```
+## 10 Regular Expression Matching
+* if `p[j-1] (current char in string p) != '*'`
+  * if `s[i-1] == p[j-1] or p[j-1] == '.'` if match, or match operator
+    * `dp[i][j] = dp[i-1][j-1]`
+* else
+  * if `ch == '*'`
+    * wildcard operator can either propogate horizontally or vertically
+      * horizontal propogation: `dp[i][j] = dp[i][j-2]`
+      * vertical propogation: `dp[i][j] |= dp[i-1][j]`
+        * only check vertical propogation if there's a char match or match operator prior to wildcard operator 
+        * |= because the horizontal propogation might have returned true.
+
+Solution:
+```python
+class Solution:
+  def isMatch(self, s, p):
+    dp = [[False]*(len(p)+1) for _ in range(len(s)+1)]
+    dp[0][0] = True
+
+    for j in range(2, len(p)+1):
+      if p[j-1] == '*': dp[0][j] = dp[0][j-2]
+
+    for i in range(1, len(s)+1):
+      for j in range(1, len(p)+1):
+        if p[j-1] != '*':
+          dp[i][j] = (s[i-1] == p[j-1] or p[j-1] == '.') and dp[i-1][j-1]
+        else:
+          dp[i][j] = dp[i][j-2]
+          if p[j-2] == s[i-1] or p[j-2] == '.': dp[i][j] |= dp[i-1][j]
+    return dp[-1][-1]
 ```
