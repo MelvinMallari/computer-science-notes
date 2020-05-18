@@ -918,3 +918,72 @@ Lots of things can go wrong in data systems:
 * termination property formalizes idea that consensus algorithm cannot simply sit around and do nothing forevre, it must make progress
 * system model of consensus assumes that when a node "crashes" it suddenly disappears and never comes back
 * in this model any algirthm that has to wait for a node to recover is not able to satisfy the termination proeprty- meaning 2PC does not meet requirement for termination
+
+### Consensus algorithms and total order broadcast
+* total order broadcast requires messages to be delivered exactly once in the same order to all nodes
+* total order broadcast is equivalent to repeated rounds of consensus:
+  * agreement property: all nodes decide to deliver message in same order
+  * integrity: messages are not duplicated
+  * validity: messages are not corrupted or fabricated
+  * termination: messages are not lost
+
+### Single-leader replication and consensus:
+* Single leader systems takes all writes to the leader and applies them to the followers in the same order
+* how come we didn't worry about consensus then?
+  * if leader is chosen manually you have a "consensus algorithm of a dicatorial variety
+* However to elect a leader you need consensus (or you get split brain/ other faults). How you break out the conundrum?
+* Epoch numbering and quorums
+  * a node can't trust its own judgement, before a leader can do anything it must check to see if there isn't another leader with a higher epoch number
+  * leader node must collect votes from a quorum of nodes. 
+  * node votes in favor of proposal if it's not aware of another leader with higher epoch num
+  * If the vote on the proposal does not expose a higher epoch number, the current leader can conclude no leader with a higher epoch number has happened.
+
+### Limitations of Consensus
+* Consensus alg's bring concrete safety properties (agreement, integrity, valididty) where everything else is uncertain
+* they provide total order broadcast
+  * and therefore linearizable atomic operations in a fault-tolerant way
+* benefits do come at a cost
+  * process by which nodes vote on a propsal before they are decided are a kind of synchronous replication
+  * consensus systems always require a strict majority to operate
+  * frequent failures means frequent leader elections and less actual work
+
+### Membership and Coordination Services
+* ZooKeeper et al are often descrived as "distributed key-value stores"
+  * How are they diff than db's?
+  * designed to only hold small amoutns of data to be kept in memory
+* ZooKeeper implements other interesting features:
+  * Linearizable atomic operations: if several nodes try to perform the same operation, only one will succeed
+  * Total ordering of operations: provides a fencing token by giving tx ID to all operations
+  * Failure detection: if a heartbeat ceases for a certain duration, zookeeper declares the session dead
+  * Change Notification: provide notifications to changes when a client joins a cluster, or fails etc. removes need to poll
+
+### Allocating work to nodes
+* leader election process useful for job schedules and similar stateful systems
+* also when you need to assign paritions to certain nodes
+* can achieve these tasks with atomic operations, ephemeral nodes and notifications in ZooKeeper
+* trying to perform majority votes over many nodes would be terrible, instead zookeeper keeps a fixed number of nodes
+
+### Service Discovery
+* ZooKeeper and other services often used for service discovery- to find which IP address to connect to particular service
+* if your service already knows who the leader is, makes sense to expose to other service who that is
+
+### Membership Services
+* a membership service determines which nodes are currently active and live members of a cluster
+
+### Chapter 9 Summary
+* causal ordering is a weaker form in linearizability, but more performant and less sensitive to network problems
+* causal orering via lamport stacks isn't enough. service needs to know _now_ not looking back. therefore we need to figure out _consensus_
+* Turns out that a wide variety of problems are reducible to consensus, and therefore if you solve one you solve them all (because you solved consensus)
+  * linearizable compare and set register: register needs to atomically decide whether to set its value based on its current value
+  * atomic transaction commit: db must decide whether to commit or abort a distributed transaction
+  * total order broadcast: messaging system must decide messaging order
+  * locks and leases: during a race for a lock/lease lock decides which one acquired it
+  * membership/coordination service: system must decide which nodes are alive/dead
+  * uniqueness constraint: constraint must decide which records are allowed to have values and which to apply constraint violation
+* This is all easy when a single node has to make the decisions. However when a leader fails or cannot be reached, there are three ways to handle the situtation:
+  * wait for leader to recover. this doesn not satisfy termination property
+  * manually fail over by getting humans to choose a new leader node. limited failover speed (relying on humans)
+  * use an algoirthm to choose a new leader. this requires consensus.
+* Single leader databases can provide linearizabiilty withotu a consensus algorithm on every write, but this only pushes the need for consensus down the road.
+* ZooKeeper outsources this consensus service
+* leaderless and multi-leader systems typically do not use global consensus
