@@ -860,13 +860,13 @@ class Solution:
         * |= because the horizontal propogation might have returned true.
 
 Solution:
+`T:o(mn), s:o(mn). m: len(s) n: len(p)`
 ```python
 class Solution:
   def isMatch(self, s, p):
     dp = [[False]*(len(p)+1) for _ in range(len(s)+1)]
     dp[0][0] = True
-
-    for j in range(2, len(p)+1):
+for j in range(2, len(p)+1):
       if p[j-1] == '*': dp[0][j] = dp[0][j-2]
 
     for i in range(1, len(s)+1):
@@ -877,4 +877,60 @@ class Solution:
           dp[i][j] = dp[i][j-2]
           if p[j-2] == s[i-1] or p[j-2] == '.': dp[i][j] |= dp[i-1][j]
     return dp[-1][-1]
+```
+
+## 118 Pascal's Triangle
+Solution:
+`T:o(n^2), s:o(1) n: numRows`
+```python
+class Solution:
+    def generate(self, numRows: int) -> List[List[int]]:
+        res = [[1]*(i+1) for i in range(numRows)]
+        for i in range(2, numRows):
+            for j in range(1, i):
+                res[i][j] = res[i-1][j-1] + res[i-1][j]
+        return res
+```
+
+## 127 Word Ladder
+* key idea is to explore minimum conversion distance with a BFS
+* key idea is that you can compare the words with other words in the word list by using a map of lists
+```python
+def constructWD(wordList):
+    d = collections.defaultdict(list)
+    for w in wordList:
+        for i in range(len(w)):
+            s = w[:i] + '_' + w[i+1:]
+            d[s].append(w)
+    return d
+  ```
+
+Solution: 
+```python
+class Solution(object):
+    def ladderLength(self, beginWord, endWord, wordList):
+        def constructWD(wordList):
+            d = collections.defaultdict(list)
+            for w in wordList:
+                for i in range(len(w)):
+                    s = w[:i] + '_' + w[i+1:]
+                    d[s].append(w)
+            return d
+        
+        def bfs(begin, end, wordDict):
+            q, visited = collections.deque([(begin, 1)]), set()
+            while q:
+                word, count = q.popleft()
+                if word == end: return count
+                for i in range(len(word)):
+                    s = word[:i] + '_' + word[i+1:]
+                    nbrs = wordDict[s]
+                    for nbr in nbrs:
+                        if nbr not in visited:
+                            visited.add(nbr)
+                            q.append((nbr, count+1))
+            return 0
+
+        d = constructWD(set(wordList))
+        return bfs(beginWord, endWord, d)
 ```

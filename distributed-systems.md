@@ -878,3 +878,43 @@ Lots of things can go wrong in data systems:
 * the FLP result is a proof that consensus between nodes cannot be reached only within a very restrictive systems model (cannot use clocks or timeouts)
 
 ### Atomic Commit and Two-Phase Commit (2PC)
+* Two Phase Commit is an algorithm for achieve atomic transaction commit across multiple nodes
+* process is similar to a traditional western marriage ceremony
+  * minister asks the bride and groom individually whether each wants to marry the other
+  * typically receives acknowledgement
+  * the minister announces the couple husband and wife and the transaction is committed
+* 2PC process
+  * when app wants to begin distributed tx, it requests a tx id from the coordinator
+  * app begins single node tx on each participants. attaches globally unique id to single node tx. if anything goes wrong coordinator can abort
+  * when app is ready, coordinator sends prepare request to all participants. By replying yes node promises to commit tx without error if request, surrenders the right to abort the tx without actually committing
+  * when coordinator receives all prepare request responses, it makes decision to commit or abort. called the _commit point_
+  * commit or abort request sent to all participants. if req fails, coordinator must retry forever until success. no going back. if participant has crashed, the tx will be committed when it recovers. 
+* 2 crucial point of no returns: when a participant votes yes it promises it will be able to commit later. when the coordinator decides, the decision is irrevocable. 
+* if a coordinator crashes the participants will wait until it returns
+
+### Distributed Transactions in Practice
+* two types of distributed transactions:
+  * database-internal distributed transactions: internal transactions among nodes of that database
+  * heterogeneous distributed transactions: partipants are two or more different technologies. 
+* Exactly-once message processing: a message from a message queue can be acknowlege as processed if and only if the database transaction for processing the message was succesfully committed
+* XA transactions: X/Open ZA is a standard for implementing two-phase commit across heterogenous technologies
+  * XA is a a C CAPI for itnerfacing with a transaction coordinator
+* holding locks while in doubt:
+  * why can't the rest of system get on and ignore the in doubt transaction that will be cleaned eventually?
+  * database transactions usually take exclusive locks to prevent dirty writes
+  * db cannot release these locks while transaction commits or aborts
+  * if coordinator's log is lost, the locks are held forever or until manually resolved
+* must treat coordinator like a kind of database
+  * must be replicated or SPOF
+  * coordinator logs a form of state, no longer stateless servers
+  * XA needs to be compatible with a wide range of data systems
+
+### Fault Tolerant Consensus
+* A consensus algorithm must satisfy the following
+  * uniform agreement: no two nodes decide differently
+  * integrity: no node decides twice
+  * validity: if a node decides value v, then v was proposed by some node
+  * termination: every node that does not crash eventually decides some value
+* termination property formalizes idea that consensus algorithm cannot simply sit around and do nothing forevre, it must make progress
+* system model of consensus assumes that when a node "crashes" it suddenly disappears and never comes back
+* in this model any algirthm that has to wait for a node to recover is not able to satisfy the termination proeprty- meaning 2PC does not meet requirement for termination
