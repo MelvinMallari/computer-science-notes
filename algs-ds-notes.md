@@ -934,3 +934,56 @@ class Solution(object):
         d = constructWD(set(wordList))
         return bfs(beginWord, endWord, d)
 ```
+
+## 171 Excel Sheet Column Number
+* Each number is a power of 26, kind like a hex number
+
+Solution:
+`T:o(n), S:o(1) n: len(s)`
+```python
+class Solution:
+  def titleToNumber(self, s):
+    res = 0
+    for l in s:
+      res = 26*res + ord(l) - ord('A') + 1
+    return res
+```
+
+## 130 Surrounded Regions
+* dfs all the `O`'s around the edges convert that to some character, call it `#`
+* dfs from the inside and the `O`'s from the inside convert to `X`
+* convert all the `#`'s to `O`
+
+Solution:
+`T:o(mn) S:o(1) m: len(board), n: len(board[0])`
+```python
+class Solution:
+  def solve(self, board):
+    if not board and not board[0]: return
+    m, n = len(board), len(board[0])
+    if m < 3 or n < 3: return board
+
+    for i in range(m):
+      if board[i][0] == 'O': self.dfs(board, i, 0, '#')
+      if board[i][n-1] == 'O': self.dfs(board, i, n-1, '#')
+    
+    for j in range(1, n):
+      if board[0][j] == 'O': self.dfs(board, 0, j, '#')
+      if board[m-1][j] == 'O': self.dfs(board, m-1, j, '#')
+
+    for i in range(1, m-1):
+      for j in range(1, n-1):
+        if board[i][j] == 'O': self.dfs(board, i, j, 'X')
+      
+    for i in range(m):
+      for j in range(n):
+        if board[i][j] == '#': self.dfs(board, i, j, 'O')
+
+  def dfs(self, board, i, j, mark):
+    if i < 0 or i >= len(board) or j < 0 or j >= len(board[0]) or board[i][j] == 'X': return
+    board[i][j] = mark
+    self.dfs(board, i+1, j, mark)
+    self.dfs(board, i-1, j, mark)
+    self.dfs(board, i, j-1, mark)
+    self.dfs(board, i, j+1, mark)
+```
