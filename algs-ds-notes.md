@@ -1018,3 +1018,25 @@ class Solution:
     return w == w[::-1]
   
 ```
+
+## 134 Gas Station
+* Two key ideas:
+  * if a car starts at A and cannot reach point B. Any station between A and B cannot reach B. `(1)`
+    * Similar to the idea in Kadane's algorithm. Idea is that you start a station with >= 0 gas, otherwise you wouldn't have been able to reach it
+  * if total gas available > total cost, then there exists a solution: This one makes intuitive sense, with enough gas you can reach any station. `(2)`
+
+Solution:
+`T:o(n), S:o(1) n: len(gas)`
+```python
+class Solution:
+  def canCompleteCircuit(self, gas, cost):
+    totalGas = totalCost = tank = start = 0
+    for i in range(len(gas)):
+      totalGas += gas[i]
+      totalCost += cost[i]
+      tank += gas[i] - cost[i]
+      if tank < 0:
+        start = i + 1 # key idea (1)
+        tank = 0
+    return start if totalGas >= totalCost else -1 # key idea (2)
+```
