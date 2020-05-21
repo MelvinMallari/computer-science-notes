@@ -895,6 +895,9 @@ class Solution:
 ## 127 Word Ladder
 * key idea is to explore minimum conversion distance with a BFS
 * key idea is that you can compare the words with other words in the word list by using a map of lists
+
+Solution
+`T:o(n^2), s:o(1) n: numRows`
 ```python
 def constructWD(wordList):
     d = collections.defaultdict(list)
@@ -986,4 +989,32 @@ class Solution:
     self.dfs(board, i-1, j, mark)
     self.dfs(board, i, j-1, mark)
     self.dfs(board, i, j+1, mark)
+```
+## 131 Palindrome Partitioning
+* dfs + backtracking
+* How to recognize backtracking?
+  * a string can be partitioned in a different _combination_ of ways
+  * string partitions do _not_ have to be the same length.
+    * if any part of the string is valid palindrome, then explore the rest of the string to confirm that it is a palindrome
+  
+Solution:
+`T:o(n!), S: o(n!) n: len(s)`
+```python
+class Solution:
+  def partition(self, s):
+    res = []
+    self.dfs(res, [], s)
+    return res
+
+  def dfs(self, res, path, s):
+    if not s:
+      res.append(path)
+      return
+    for i in range(1, len(s)+1):
+      if self.isPal(s[:i]):
+        self.dfs(res, path+[s[:i]], s[i:])
+
+  def isPal(self, w):
+    return w == w[::-1]
+  
 ```
