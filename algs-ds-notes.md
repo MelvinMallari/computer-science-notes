@@ -257,7 +257,7 @@ class Solution:
     return (skipRoot, robRoot)
 ```
 
-## 581 Shorted Unsorted Continuous Subarray
+## 581 Shortest Unsorted Continuous Subarray
 * Key idea is that you loop through the array searching for the lefmost and rightmost numbers that break the sorted invariant
 * Sorted Invariant: any number should be >= than the largest number to its left. any number should be =< than the smallest number to its right. 
 
@@ -1039,4 +1039,23 @@ class Solution:
         start = i + 1 # key idea (1)
         tank = 0
     return start if totalGas >= totalCost else -1 # key idea (2)
+```
+
+## 162 Peak Element
+* Realize that a peak element is just the largest number in the sorted portion of an array
+* therefore we can use binary search, because we are guaranteed a peak number and therefore a sorted portion
+
+Solution:
+`T: o(logn) S: o(1). n: len(nums)`
+```python
+class Solution:
+  def findPeakElement(self, nums):
+    i, j = 0, len(nums)-1
+    while i < j:
+      mid = (i + j) // 2
+      if nums[mid+1] > nums[mid]:
+        i = mid + 1
+      else:
+        j = mid
+    return i
 ```
