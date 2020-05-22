@@ -1059,3 +1059,34 @@ class Solution:
         j = mid
     return i
 ```
+
+## 189 Rotate Array
+* have to mod k with the len(nums) in case k > len(nums)
+* learned that nums[:] modifies original array
+* way to do this in o(1) space to reverse the entire array, then reverse the two portions
+
+Solution 1:
+`T: o(n), s: o(n), n: len(nums)`
+```python
+class Solution:
+  def rotate(self, nums, k):
+    k = k % len(nums)
+    nums[:] = nums[-k:] + nums[:-k]
+```
+
+Solution 2:
+`T: o(n), s: o(1), n: len(nums)`
+```python
+class Solution:
+  def rotate(self, nums, k):
+    def reverse(i, j):
+      while i < j:
+        nums[i], nums[j] = nums[j], nums[i]
+        i += 1
+        j -= 1
+    k, n = k % len(nums), len(nums)
+    if k: # not necessary speeds up some test cases
+      reverse(0, n-1)
+      reverse(0, k-1)
+      reverse(k, n-1)
+```
