@@ -1090,3 +1090,74 @@ class Solution:
       reverse(0, k-1)
       reverse(k, n-1)
 ```
+
+## 210 Course Schedule II
+* topological sort
+
+Solution 1 (recursive dfs):
+`T: o(v + e), s: o(n), n: numCourses, v: num vertices, e: num edges`
+```python
+class Solution:
+  def findOrder(self, numCourses, prereqs):
+    graph = collections.defaultdict(set)
+    visited = [0 for _ in range(numCourses)]
+    for x, y in prereqs:
+      graph[x].add(y)
+    res = []
+    for i in range(numCourses):
+      if not self.dfs(i, graph, visited, res): return []
+    return res
+
+  def dfs(self, course, graph, visited, res):
+    if visited[course] == -1: return False
+    if visited[course] == 1: return True
+    visited[course] = -1
+    for nbr in graph[course]:
+      if not self.dfs(nbr, graph, visited, res): return False
+    visited[course] = 1
+    res.append(course)
+    return True
+```
+
+Solution 2 (iterative dfs):
+`T: o(v + e), s: o(n), n: numCourses, v: num vertices, e: num edges`
+```python
+class Solution:
+  def findOrder(self, numCourses, prereqs):
+    graph = collections.defaultdict(set)
+    indegree = collections.defaultdict(int)
+    for x, y in prereqs:
+      indegree[x] += 1 # indegree in this case is how many prereqs a course has {course: {prereqs....}}
+      graph[y].add(x) #{prereqs: {courses...}}
+    stack, res = [c for c in range(numCourses) if indegree[c] == 0], []
+    while stack:
+      course = stack.pop()
+      res.append(course)
+      for nbr in graph[course]:
+        indegree[nbr] -= 1
+        if indegree[nbr] == 0: stack.append(nbr)
+      del graph[course]
+    return res if len(res) == numCourses else []
+```
+
+Solution 2 (bfs):
+`T: o(v + e), s: o(n), n: numCourses, v: num vertices, e: num edges`
+```python
+class Solution:
+  def findOrder(self, numCourses, prereqs):
+    graph = collections.defaultdict(set)
+    indegree = collections.defaultdict(int)
+    for x, y in prereqs:
+      indegree[x] += 1
+      graph[y].add(x)
+    q = collections.deque([c for c in range(numCourses) if indegree[c] == 0])
+    res = []
+    while q:
+      course = q.popleft()
+      res.append(course)
+      for nbr in graph[course]:
+        indegree[nbr] -= 1
+        if indegree[nbr] == 0: q.append(nbr)
+      del graph[course]
+    return res if len(res) == numCourses else []
+```
