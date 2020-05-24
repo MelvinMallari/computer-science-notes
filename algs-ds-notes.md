@@ -1161,3 +1161,37 @@ class Solution:
       del graph[course]
     return res if len(res) == numCourses else []
 ```
+## 140 Word Break II
+* dynamic programming
+* we recursively explore the rest of the word after there is a match, if there is letters left in s to explore
+* if match, then append the word with a space to all the matches
+  * as we backtrack up the recursive calls, then we append matched words a long the way (with breaks/spaces)
+* as backtrack up we will memoize the result
+
+**Base Cases**
+* if not s, return [] - no string, no result
+* if s starts with word, and len(word) == len(s) - append to result without space, this is end of word break
+
+Solution:
+`T: O(mn) S:o(mn) m: len(s), n: len(wordDict)`
+```python
+class Solution:
+  def wordBreak(self, s, wordDict):
+    return self.helper(s, wordDict, {})
+
+  def helper(self, s, wordDict, memo):
+    if s in memo: return memo[s]
+    if not s: return []
+    res = []
+    for word in wordDict:
+      if not s.startswith(word): continue
+      if len(word) == len(s):
+        res.append(word)
+      else: 
+        rest = self.helper(s[len(word):], wordDict, memo)
+        for item in rest:
+          item = word + ' ' + item
+          res.append(item)
+    memo[s] = res
+    return res
+```
