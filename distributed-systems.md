@@ -987,3 +987,58 @@ Lots of things can go wrong in data systems:
 * Single leader databases can provide linearizabiilty withotu a consensus algorithm on every write, but this only pushes the need for consensus down the road.
 * ZooKeeper outsources this consensus service
 * leaderless and multi-leader systems typically do not use global consensus
+
+## Chapter 10 Batch Processing
+* Service: Waits for a request or instructions from a client to arrive to send a response back.
+* Batch Processing System: takes a large amount of input data, runs a job to process it and produces some output data
+  * ran periodically
+  * primary perfomrance measure is througput
+* Stream processing systems (near-real-time systems): somewhere between online and offline/batch processing. 
+  * consumes inputs and produces outputs
+  * stream job operates on events shortly after they happen
+* MapReduce is a fairly low-level programming model compared to parallel processing system
+
+### Batch Processing with Unix Tools
+* Unix commands allow simple log analysis
+* Unix Philosophy:
+  1. Each program does one thing well
+  2. Expect the output of every program to become the input of another
+  3. Design and build software to be tried early, ideally within weeks. Throw away clumsy parts and rebuild
+  4. Use Tools in preference to unskilled help to lighten a programming task
+
+### MapReduce and Distributed File Systems
+* MapReduce is a bit like Unix tools, but distributed across potentially thousands of machines
+* MapReduce does not modify input. Output files are written once, in a sequential fashion
+* MapReeduce jobs read and write files on a distributed filesystem. 
+  * in Hadoop's implementation it's called HDFS (Hadoop Distributed File System)
+* HDFS is a shared-nothing principle. (each node uses it's own non-special hardware)
+* HDFS consists of a daemon process running on each machine exposing a network service that allows other nodes to access files stored in the machine
+* HDFS conceptually creates on big file system using disk space on all machines running the daemon
+  * SImilar to RAID which provides redudnancy across several disks attached to the same machien
+
+### MapReduce Job Execution
+* MapReduce is a programming framework which you can write code to process large datasets in a distributed file system like HDFS
+  1. Read a set of input files, break it into records
+  2. Call the mapper func to extract a key and value from each input record (map)
+  3. Sort all the key-value pairs by key
+  4. Call the reducer func to iterate over the sorted key-value pairs. If multiple occurrences of same key, sort makes them adjacent to minimize memory usage via combining (reduce)
+* Mapper: 
+  - called once for every input record and its job is to extract the key and value from input record. 
+  - may generate any number of key-value pairs
+* Reducer: 
+  - takes key-value pairs produced by the mappers, collects all the values belonging to the same key
+  - calls the reducer with an iterator over the collection of values
+* mapper prepares data into a form suitable for sorting. Reducer processes the sorted data.
+* main difference from Unix pipe commands is that MapReduce can parallelize a computation across many different machines without having to write explicity parallelized code. 
+  * mapper and reducer only operate on one record at a time, they don't need to know where the input is coming from, our output is going to
+  * framework handles the complexities of moving data between machines
+
+* when a mapper finishes reading its input files and writing its sorted outputs files. The MapReduce scheduler notifies the reducer that they can start fetching the output files from the mapper.[]
+* reducers connect to each of the mappers and download the fiels of sorted key-value pairs for their partition
+* the process of paritioning by reducer, sorting, and copying data partitions from mappers to reducers is known as the _shuffle_
+
+### mapreduce workflows
+* the range of problems you can solve with single mapreduce job is limited
+* a single mapreduce job coudl determine the number of page views per URL, but not the most popular URL- that requires a second round of sorting
+* Thus, it is very common for mapreduce jobs to be chained together into workflows- output of one job is the input to another
+* 
