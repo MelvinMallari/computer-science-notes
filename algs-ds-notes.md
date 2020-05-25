@@ -1163,7 +1163,7 @@ class Solution:
 ```
 ## 140 Word Break II
 * dynamic programming
-* we recursively explore the rest of the word after there is a match, if there is letters left in s to explore
+* recursively explore rest of the word after word match, if letters left in s to explore
 * if match, then append the word with a space to all the matches
   * as we backtrack up the recursive calls, then we append matched words a long the way (with breaks/spaces)
 * as backtrack up we will memoize the result
@@ -1173,7 +1173,7 @@ class Solution:
 * if s starts with word, and len(word) == len(s) - append to result without space, this is end of word break
 
 Solution:
-`T: O(mn) S:o(mn) m: len(s), n: len(wordDict)`
+`T: o(mn) S:o(mn) m: len(s), n: len(wordDict)`
 ```python
 class Solution:
   def wordBreak(self, s, wordDict):

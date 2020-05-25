@@ -1039,6 +1039,39 @@ Lots of things can go wrong in data systems:
 
 ### mapreduce workflows
 * the range of problems you can solve with single mapreduce job is limited
-* a single mapreduce job coudl determine the number of page views per URL, but not the most popular URL- that requires a second round of sorting
+* a single mapreduce job could determine the number of page views per URL, but not the most popular URL- that requires a second round of sorting
 * Thus, it is very common for mapreduce jobs to be chained together into workflows- output of one job is the input to another
-* 
+* map reduce has no concept of indexes
+* with mapreduce if you give a job a set of files, you read the entire content of the files
+  * this is expensive if you just want to look at a small set of files
+* however in analytics it is common to want to look at aggregates
+  * e.g. task may need to correlate user activity with user profile information
+  * simplest implementation is go over activity events one by one and query user db for every user ID it encounters
+    * limited throughput
+  * better approach would be to take a copy of the user db and put it in the same distributed file systems as the log of users activity events
+    * in this case you have the user db and user activity records as files in the HDFS and can run a mapReduce job
+
+### The output of batch workflows
+* what is the result of all this processing, once done? why are we running all these jobs in the first place?
+* Google's orignal use of MapReduce was to build indexes for its search engine
+* full-text search index are essentially files in which you can efficiently look up a particular keyword and find a list of all the document IDs containing that keyword
+* if you need to perform full-text search over a fixed set of documents, batch process of building the indexes
+* mappers partition set of documents as needed. reducers build the index for its partition. index file is written to the distributed file system
+  * building document-partiion indexes parallelizes well
+* another common use is to build machine learning systems such as classifiers (spam filters, anomaly detection, image recognition)
+* output of batch jobs often some kind of database
+* how does th eoutput of the batch process get back into a database where the web app can query it?
+  * good solution is to build a brand new database inside the batch job and write it as files to the job's output directory in the distributed file sytem
+
+### Comparing Hadoop to Distributed Databases
+* hadoop is somewhat like a distributed version of Unix
+  * HDFS is the filesystem
+  * MapReduce is a quirky implementation of a Unix Process
+* massively parallel processing (MPP): db's that focus on parallel execution of analytic SQL queries on a cluster of machines
+* db's require a particular model, while distributed fs can just be a sequence of bytes
+  * in practice it's better to make data available quickly- in any format. it's more valuable than trying to deicde the data model up front.
+* MPP's are monolithic, tightly integrated pieces of software that take care of storage layout on disks, query planning, scheduling and execution
+  * can achieve good performance on query's it's designed for
+* however not all kinds of processing can be expressed in SQL queries
+* MapReduce gave engineers the ability to easily run their own code over large datasets
+
