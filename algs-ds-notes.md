@@ -1195,3 +1195,33 @@ class Solution:
     memo[s] = res
     return res
 ```
+
+## 150 Reverse Polish Notation
+* use a stack 
+* loop through the tokens:
+  * if current token is in set of operators
+    * pop top two values and apply the relevant operator
+  * else
+    * append to stack
+
+Solution:
+`t: o(n), s:o(n) n: len(token)`
+```python
+class Solution:
+  def evalRPN(self, tokens):
+    stack = []
+    for token in tokens:
+      if token not in '+-*/':
+        stack.append(int(token))
+      else:
+        y, x = stack.pop(), stack.pop()
+        if token == '+':
+          stack.append(x+y)
+        elif token == '-':
+          stack.append(x-y)
+        elif token == '*':
+          stack.append(x*y)
+        else:
+          stack.append(int(x/y))
+    return stack[-1]
+```
