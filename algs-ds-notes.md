@@ -1225,3 +1225,59 @@ class Solution:
           stack.append(int(x/y))
     return stack[-1]
 ```
+
+## 454 4Sum ii 
+* invariant: (i, j, k, l) such that A[i] + B[j] + C[k] + D[l] = 0 
+* can be rewritten as A[i] + B[j] = -(C[k] + D[l])
+* use a hasmap to store all combinations of a + b sums - find all c + d sums that are complements to a+b
+
+`T: o(n^2), S: o(n^2) n: len(A or B or C or D)`
+```python
+class Solution:
+  def fourSumCount(self, A, B, C, D):
+    hashMap = collections.defaultdict(int)
+    count = 0
+    for a in A:
+      for b in B:
+        hashMap[a+b] += 1
+    for c in C:
+      for d in D:
+        count += hashMap[-c-d]
+    return count
+```
+
+## 395 Longest Substring with at least K repeating characters
+* substring -> sliding window
+* if h represents the num unique characters, k min repetitions for every character
+  * want to find the max length of the candidate solutions that fulfill the h and k requirements
+
+Solution:
+`T: o(n) S: o(n) n: len(s)`
+```python
+class Solution:
+  def longestSubstring(self, s, k):
+    res = 0
+    for i in range(1, 27): 
+      res = max(res, self.helper(s, k, i))
+    return res
+
+  def helper(self, s, k, numUniqCharsTarget):
+    start = end = numUniqChars = numNoLessThanK = res = 0
+    chMap = collections.defaultdict(int)
+
+    while end < len(s):
+      if chMap[s[end]] == 0: numUniqChars += 1 
+      chMap[s[end]] += 1
+      if chMap[s[end]] == k: numNoLessThanK += 1
+      end += 1
+    
+      while numUniqChars > numUniqCharsTarget:
+        if chMap[s[start]] == k: numNoLessThanK -= 1
+        chMap[s[start]] -= 1
+        if chMap[s[start]] == 0: numUniqChars -= 1
+        start += 1
+      
+      if numUniqChars == numNoLessThanK: res = max(res, end - start)
+
+    return res
+```
