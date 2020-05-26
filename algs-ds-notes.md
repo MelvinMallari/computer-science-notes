@@ -1198,9 +1198,9 @@ class Solution:
 
 ## 150 Reverse Polish Notation
 * use a stack 
-* loop through the tokens:
-  * if current token is in set of operators
-    * pop top two values and apply the relevant operator
+* loop through tokens:
+  * if current token in set of operators
+    * pop top two values and apply relevant operator
   * else
     * append to stack
 

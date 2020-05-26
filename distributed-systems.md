@@ -1075,3 +1075,56 @@ Lots of things can go wrong in data systems:
 * however not all kinds of processing can be expressed in SQL queries
 * MapReduce gave engineers the ability to easily run their own code over large datasets
 
+## Chapter 10 Summary
+* Unix tool philosophy (in awk, grep, sort) is carreid forard into MapREduce
+* Two main problems that distributed batch processing need to solve are 
+  * Partitioning:
+    * mappers are partition according to input file blocks. output is repartitioned, sorted and merged intoa configuarable number of reducer partitions
+  * Fault Tolerance:
+    * mapreduce frequently writes to disk, making it easier to recover from an individual failed task without restarting job.
+      * this slows down execution in the failure free case
+* Several join algorithms for MapReduec 
+  * Sort-merge joins
+    * each inputs being joined goes through mapper that extracts join key. By partitioning, sorting and merging all records with same key go to same reducer
+  * Broadcast hash joins
+    * one of two joins is small, so it is not partition and can be entirely loaded into a hash table. 
+    * Can start mapper for each partition of the large join input, load hash table for small input into each mapper then scan over large input one record at a time querying the hash table for the record
+  * Partition Hash joins
+    * if two joisn are partition in the same way (using same key, same hash function and same partitions) then hash table approach can be used indpendently for each partiion
+* callbacks in distributed batch processing engines (mappers and reducers) assumed to be stateless. This allows retries without side effects.
+* frame can guarantee fault tolerance, your code doesn't have to worry about that
+* distinguishing featuer of batch processing si that it reads some input data and produces some output data wihtout modifying input
+* data is _bounded_, it has a known and fixed size. a job is eventually complete.
+
+## Chapter 11 Stream Processing
+* in reality, a lot of data is unbounded because it arrives gradually over time
+* to reduce the delay of batch processing, we can run the processing more frequently or even continuosly by abandoning the fixed time slices entirely
+* "stream" refers to data that is incrementally made available over time
+* a record is known as an _event_, a small, self-contained immutable object of something that happened with a timestamp
+* events are generated once by a _producer_, then potentially processed by multiple _consumers_
+* best way to connect producers and consumers is through a notification mechanism. this prevents the need to poll. specialized tooling has been developed to deliver notifications.
+
+### Messaging Systems
+* a common approach for notifying consumers about new events
+* to differentiate systems ask these two questions:
+  * what happens if the producers send messages faster than the consuemr can process them
+    * three options: drop messages, buffer messages in a queue, apply backpressure (blocking producer from sending more messages)
+  * what happens if nodes crach or temporarily go offline - any messages lost?
+    * tradeoff between writing to disk for durability or performance loss.
+    * acceptability of message loss dependent on your application
+* some messaging systems use direct network communication between produces and consumers without intermediary nodes
+
+### Message Brokers
+* a widely used alternative to send messages (also known as a message queue).
+* essentially a kind of database that is optimized for handling message streams
+* runs as as server with producers and consumers connecting to it as clients
+* producers write messages to the broker, and consumers receive them by reading them from the broker
+* by centralizing the broker, these systems can more easily tolerate clients that come and go. durability moved to broker
+* consequence of queueing is that consumers are generally asynchronous
+
+### Message brokers compared to databases
+* some message brokers can participate in two-phase commit protocols
+* important diff's with db's:
+  * db's keep data until explicity deleted. message brokers delete message once delivered to consumer
+  * since they delete messages, brokers assume their working set is fairly small (ie queues are short)
+  * db's support secondary indexes. brokers support some way of subscribing to a subset of topics matching some pattern
