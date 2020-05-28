@@ -1281,3 +1281,53 @@ class Solution:
 
     return res
 ```
+
+## 76 Minimum Window Substring
+* sliding window
+* keep count of the characters within the window range.
+* expand to the right while we have relevant characters still to include in the substring
+* close the window while non-relevant characters are included
+
+Solution:
+`T: o(n), S: o(n) n: len(s)`
+```python
+class Solution:
+  def minWindow(self, s, t):
+    counter = collections.Counter(t)
+    start = end = i = 0
+    missing = len(t)
+    for j, ch in enumerate(s, 1):
+      if counter[ch] > 0: missing -= 1
+      counter[ch] -= 1
+      if missing == 0:
+        while i < j and counter[s[i]] < 0:
+          counter[s[i]] += 1
+          i += 1
+
+        if end == 0 or j - i < end - start:
+          start, end = i, j
+        
+        counter[s[i]] += 1
+        i += 1
+        missing += 1
+    return s[start:end]
+```
+
+## 3 Longest Substring without repeating characters
+* sliding window
+
+Solution 1:
+`T: o(n), S: o(n) n: len(s)`
+```python
+class Solution:
+  def lengthOfLongestSubstring(self, s):
+    seen = collections.defaultdict(int)
+    i = res = 0
+    for j, ch in enumerate(s):
+      if ch in seen and i <= seen[ch]: 
+        i = seen[ch] + 1
+      else:
+        res = max(res, j - i + 1)
+      seen[ch] = j
+    return res
+```
