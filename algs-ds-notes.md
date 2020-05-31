@@ -1331,3 +1331,55 @@ class Solution:
       seen[ch] = j
     return res
 ```
+
+### 384 Shuffle an Array
+
+Solution:
+`T: o(n), S: o(1). n: len(nums)`
+```python
+class Solution:
+  def __init__(self, nums):
+    self.nums = nums
+
+  def reset(self):
+    return self.nums
+  
+  def shuffle(self):
+    res = self.nums[:]
+    for i in range(len(res)):
+      j = random.randrange(i+1)
+      res[i], res[j] = res[j], res[i]
+    return res
+```
+
+### 380 Insert Delete GetRandom O(1)
+
+Solution:
+`T: o(1), S: o(n). n: len(nums)`
+
+```python
+class RandomizedSet:
+  def __init__(self):
+    self.array, self.hashMap = [], {}
+
+  def insert(self, val):
+    if val not in self.hashMap:
+      self.hashMap[val] = len(self.array)
+      self.array.append(val)
+      return True
+    return False
+  
+  def delete(self, val):
+    if val in self.hashMap:
+      i = self.hashMap[val]
+      last = self.array[-1]
+      self.array[i] = last
+      self.hashMap[last] = i
+      self.array.pop()
+      del self.hashMap[val]
+      return True
+    return False
+
+  def getRandom(self):
+    return self.array[random.randrange(len(self.array))]
+```
