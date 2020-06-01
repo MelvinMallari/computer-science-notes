@@ -1128,3 +1128,143 @@ Lots of things can go wrong in data systems:
   * db's keep data until explicity deleted. message brokers delete message once delivered to consumer
   * since they delete messages, brokers assume their working set is fairly small (ie queues are short)
   * db's support secondary indexes. brokers support some way of subscribing to a subset of topics matching some pattern
+
+### Multiple Consumers
+* Load Balancing:
+  * Each meessage is delivered to one of the consumers. useful when message are expensive to process
+* Fan Out:
+  * Each message is delivered to all of the consumers. Allows several independent consumers to tune in without affecting each other
+* Combination:
+  * approaches can be combined
+
+### Acknowledgements and redelivery
+* Consumers may crash an any time. To ensure that the message is not lost, message brokers use acknowledgments: a client must explicitly it has finished processing the message
+
+### Partition Logs
+* even message brokers that durable write messages to disk quickly delete them again after they have been delivered to consumers, because they are built with transient messaging mindset. 
+* Databases and filesystems take the opposite approach. Data is normally expected to be permanently stored.
+* Why can't we have hybrid? combining the durable storage approach of databases in the low-latency notification facilities or messaging. in comes _log-based message brokers_
+* a log is an append-only sequence of records on disk.
+* the same structure can be used to implement a message broker
+  * producer sends messages by appending to end of log
+  * consumer receives messages by reading the log sequentially
+  * if consumer reaches end of log, wait for notification of new message append
+* to scale to a higher throughput, the log can be partitioned. 
+  * different logs can be hosted on different machines
+  * each partitions is a separate log that can be read or written independent from other partitions
+* messages within a partition are totally ordered. no ordering guarantee across different partitions.
+
+### Logs compared to traditional messaging
+* log based approach trivially supports fan-out messaging.
+  * several consumers can independently read the log without affecting each other
+* In situations where messages may be expensive to process and you want to paralellize on a message by message basis and message order not important
+  * JMS/AMQP style of message broker is preferrable.
+* In situations with high message throughput, where each message is fast to process and where message ordering is important
+  * log-based approach works well
+
+### Consumer offsets:
+* broker does not need to track acknowledgments for every single message. it only needs to periodically record consumer offsets
+* message broker behaves like a leader database and the consumer like a follower
+
+### Disk space usage
+* if you only ever append to a log, eventually you will run out of disk space. 
+* the log is actually divided into segments and from time to time old segments are deleted and moved to archive storage
+* have to delete old messages, disk acts as a buffer
+
+### When consumer cannot keep up with producers
+* if a consumer falls so far behind that the messages it requires are older than what's retained on disk, it will not be able to read those messages
+  * broker must drop old messages further back than the size of buffer 
+* you can monitor how far a consumer is from head of log and raise alert if it falls back significantly
+
+### Databases and Streams
+* the fact that something was written to a database is an event that can be captured, stored and processed. 
+  * this suggests that connection between db and streams runs deeper than just physical storage of logs on disk.
+* a replication log is essentially a stream of database write events, produced by the leader
+
+### Keeping systems in sync
+* As the same or related data appears in several different places, they need to be kept in sync with each other.
+  * if item updated in db, it needs to be updated in cache, search index and data warehouse
+  * with data warehouses this is usually performed by ETL process.
+* if periodic full db dumps are too slow an alternative used is _dual writes_
+  * app code explicitly writes to each system when data changes
+  * dual writes have some serious problems
+    * one write may fail while others succeed
+    * ensuring that they both succeed or fail is a case of atomic commits, which are expensive
+  
+### Change Data Capture
+* database replication logs mostly considered an internal implementation detail of database not a public API
+* for this reason, difficult to take all changes made in database and replicate them to a different storage technology like a search index, cache or data warehouse.
+* _change data capture (CDC)_: the process of observing all data changes written to a db and extracting them in a form that they can be replicated in other systems
+
+### Implementing change data capture
+* we can call log consumer _derived data systems_
+* CDC makes one db the leader and turns others into followers
+* a log based message broker is well suited for transporting the change events from source db since it perserves order of messages.
+* like message brokers, change data captures are usually asynchronous
+
+### Initial Snapshot
+* if you have a log of all changes that were ever made to a db, you can reconstruct the entire state of db by replaying the log
+* in many cases keeping all changes forever would require too much disk space, and replaying it would take too long so the log needs to be truncated.
+
+### Log Compaction
+* if you can only keep a limited amount of log history, you need to go through the snapshot process every time you want to add a new dervied system
+  * log compaction provides a good alternative
+* process is simple:
+  * storage engine looks for duplicate keys
+  * throws away duplicates
+  * keeps only the most recent update for each key
+  * compaction and merging process runs in the background
+* in a log structured storage engine, an update with a special null value (a tombstone) indicates that a key was deleted
+  * this marks it for removal during log compaction
+* if CDC system is set up such that 
+  * every change has primary key 
+  * every update for a key replaces the previous value for that key
+  * then it's sufficient to keep just the most recent 
+* whenever you want to rebuild a derived data system 
+  * start a new consumer from offset 0 of the log compacted topic
+  * sequentially scan over all messages in the log
+  * log is guaranteed to contain most recent value for each key in the database
+
+### Event Sourcing
+* event sourcing involves storing all changes to application state as a log of change events
+* biggest difference is that event sourcing applies the idea at a different level of abstraction
+  * in change data capture, the application uses the database in a mustable way.
+  * can update and delete records at will
+  * log of changes is extrated from the database at a low level 
+    * ensures the order of writes extracted from the database matches the order in which they were written
+* application logic is explicitly built on basis of immutable events that are written to an event log
+  * event store is append-only.
+  * updates or deletes are discouraged or prohibited.
+  * events reflecting things that happen at the app level rather than low level state changes
+* event sourcing is a powerful technique for data modeling
+  * from app POV more meaningful to records user's actions as immutable events.
+
+### commands and events
+* event sourcing is careful to distinguish between events and commands
+  * initially a command
+  * if succesful validation and acceptance, it becomes an event
+  * events are durable and immutable
+* consumer of event stream is not allowed to reject an event
+* therefore validation of command needs to happen synchronously before it becomes an event
+
+### State, Streams and Immutability
+* principle of immutability is what makes event sourcing and CDC powerful
+  * batch processing benefitted from immutability bc you could run experimental processing jobs without damaging anything
+* key idea is mutable state and append-only log of immutable events do not contradict each other
+  * the _changelog_ represents the evolution of state over time
+* if you store the changelog durably, by definition the state is reproducible
+* transaction logs record all changes made to a database:
+* high speed appends are the only way to change the log
+* contents in database hold a caching of the latest record values in the logs
+* truth is the log
+
+### Advantages of immutable events
+* with an append only log of immutable events, it is much easier to dianose what happened and recover from problem
+* it may be useful from analytics point of view to know certain events happened even if later canceled by other events
+
+### Deriving several views from the same event log
+* if you separating mutable state from the immutable event, 
+  * you can derive several different read-oriented representations from the same log of events
+* if you want to introduce a feature that presents your existing data in some new way
+  * you can use the event log to build a separate read optimized view for the new feature
+  * can run alongsized existing systems without modification
