@@ -1383,3 +1383,53 @@ class RandomizedSet:
   def getRandom(self):
     return self.array[random.randrange(len(self.array))]
 ```
+
+
+### 378 Kth Smallest in a Sorted Matrix
+Solution 1:
+`t: o(min(k,n)*klog(n)) s: min(k, n). n: len(matrix)`
+```python
+from heapq import *
+class Solution:
+  def kthSmallest(self, matrix, k):
+    minHeap = []
+    for i in range(min(k, len(matrix))):
+      heappush(minHeap, (matrix[i][0], i, 0))
+    count = 0
+    while minHeap:
+      n, row, col = heappop(minHeap)
+      count += 1
+      if count == k: return n
+      if col + 1 < len(matrix[row]): heappush(minHeap, (matrix[row][col+1], row, col+1))
+    return None
+```
+
+Solution 2:
+```python
+class Solution:
+  def kthSmallest(self, matrix, k):
+    start, end = matrix[0][0], matrix[-1][-1]
+    while start < end:
+      mid = (start + end) // 2
+      smaller, larger = matrix[0][0], matrix[-1][-1]
+      count, smaller, larger = self.helper(matrix, mid, smaller, larger)
+      if count == k: return smaller
+      if count < k:
+        start = larger
+      else:
+        end = smaller
+    return start
+
+  def helper(self, matrix, mid, smaller, larger):
+    count, n = 0, len(matrix)
+    row, col = n - 1, 0
+    while row >= 0 and col < n:
+      if matrix[row][col] > mid:
+        larger = min(larger, matrix[row][col])
+        row -= 1
+      else:
+        smaller = max(smaller, matrix[row][col])
+        count += row + 1
+        col += 1
+    return count, smaller, larger
+```
