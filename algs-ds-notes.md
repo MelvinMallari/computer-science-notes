@@ -1,5 +1,9 @@
 # Algorithms and Data Structure Notes
 
+## Resources
+
+[leetcode resources](https://leetcode.com/discuss/general-discussion/665604/important-and-useful-links-from-all-over-the-leetcode)
+
 ## 309 Best Time to Buy and Sell Stock with Cooldown
 
 This can be solved with dynamic programming. The three different actions (buy, sell, rest) take us between 3 different states: s0, s1, s2.
@@ -1432,4 +1436,43 @@ class Solution:
         count += row + 1
         col += 1
     return count, smaller, larger
+```
+
+### 328 Odd Even Linked List
+* two pointers, weaving through linked list
+* point the odd list to the even list
+```python
+class Solution:
+  def oddEvenList(self, head):
+    if not head or not head.next: return head
+    oddH, evenH = head, head.next
+    currO, currE = oddH, evenH
+    while currO.next and currO.next.next:
+      currO.next, currE.next = currO.next.next, currE.next.next
+      currO, currE = currO.next, currE.next
+    if currE: currE.next = None
+    currO.next = evenH
+    return oddH
+```
+
+### 350 Intersection of Two Arrays II
+Solution 1:
+`t: o(n), s: o(m). n: len(nums1), m: len(nums2)`
+```python
+class Solution:
+  def intersect(self, nums1, nums2):
+    count, res = collections.Counter(nums1), []
+    for n in nums2:
+      if count[n] > 0:
+        res.append(n)
+        count[n] -= 1
+    return res
+```
+
+Solution 2:
+`t: o(max(nlogn, mlogm): s: o(1) n: len(nums1), m: len(nums2)`
+```python
+class Solution:
+  def intersect(self, nums1, nums2):
+    n1, n2, res = sorted(nums1), sorted(nums2), []
 ```
