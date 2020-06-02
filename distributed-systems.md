@@ -1268,3 +1268,44 @@ Lots of things can go wrong in data systems:
 * if you want to introduce a feature that presents your existing data in some new way
   * you can use the event log to build a separate read optimized view for the new feature
   * can run alongsized existing systems without modification
+
+### Concurrency Control
+* biggest downside of event sourcing and change data capture
+  * consumers of event log are usually asynchronous
+  * possibility that a user may make a write to the log
+  * then read from log-derived view and find that their write has not yet been reflected
+* one solution is to perform the updates of the read view synchronously with appending the event to the log
+  * this requires a tx to combine writes into an atomic unit, 
+  * need to keep either event log and read view in the same storage system
+  * or need distributed transaction across different systems.
+* deriving current state from an event log simplifies some aspects of concurrency control
+  * with event sourcing, can design an event to be self contained description of user action
+  * user action then requires only a single write in one place- to the event log
+
+### Limitations of Immutability
+* there may be circumstances where you need to permanaently delete data
+  * regulation, privacy reasons
+* In these circumstances, it's not sufficient to just append another event to the log
+  * you want rewrite history and pretend the data was never written in the first place
+* Complete deletion is difficult. more of a matter of "making it harder to retrieve the data"
+
+### Processing Streams
+* what can you do with a stream once you have it?
+  * you can take the data in the events and write it to a database, cache, search index or similar storage system.
+    * can be queries by other clients
+    * good way of keeping db in sync with changes happening in other systems
+  * you can push events to users in some way (email alerts, push notifications, real-time dashboard)
+  * you can process one or more input streams to produce one or more outputs sreams
+    * a pipeline of several processing stages
+* a piece of code that processes streams is known as an _operator_ or a _job_
+* stream never ends, so you can't sort it
+
+ _job_
+* stream never ends, so you can't sort it
+
+### Uses of Stream Processing
+* Stream processing has long been used for monitoring purposes:
+  * Fraud Detection system (e.g. credit card usage)
+  * Trading Systems. Make trades according to changes in financial markets
+  * Manufacturing Systems. Monitor the status of machines in a factory.
+  * Militry and inteligence systems. Track activities of potential aggressors. raise alarms if signs of attack. 
