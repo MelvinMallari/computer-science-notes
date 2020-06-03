@@ -1487,3 +1487,58 @@ class Solution:
         p2 += 1
     return res
 ```
+
+### 341 Flatten Nested Iterator
+
+Solution 1:
+`t: o(max(m, n)) s: o(n) n: len(list) m: largest amount of nesting`
+```python
+#class NestedInteger:
+#    def isInteger(self) -> bool:
+#        """
+#        @return True if this NestedInteger holds a single integer, rather than a nested list.
+#        """
+#
+#    def getInteger(self) -> int:
+#        """
+#        @return the single integer that this NestedInteger holds, if it holds a single integer
+#        Return None if this NestedInteger holds a nested list
+#        """
+#
+#    def getList(self) -> [NestedInteger]:
+#        """
+#        @return the nested list that this NestedInteger holds, if it holds a nested list
+#        Return None if this NestedInteger holds a single integer
+#        """
+class NestedIterator:
+  def __init__(self, nestedList: [NestedInteger]):
+    self.stack = nestedList[::-1]
+
+  def next(self) -> int:
+    return self.stack.pop().getInteger()
+
+  def hasNext(self) -> bool:
+    while self.stack:
+      top = self.stack[-1]
+      if top.isInteger(): return True
+      self.stack = self.stack[:-1] + top.getList()[::-1]
+    return False
+```
+
+Solution 2:
+`t: o(max(m, n)) s: o(n) n: len(list) m: largest amount of nesting`
+```python
+class NestedIterator:
+  def __init__(self, nestedList: [NestedInteger]):
+    self.dq = collections.deque(nestedList)
+
+  def next(self) -> int:
+    return self.dq.popleft().getInteger()
+
+  def hasNext(self) -> bool:
+    while self.dq:
+      if self.dq[0].isInteger(): return True
+      first = self.dq.popleft()
+      self.dq.extendleft(first.getList()[::-1])
+    return False
+```
