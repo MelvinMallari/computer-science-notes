@@ -1300,12 +1300,87 @@ Lots of things can go wrong in data systems:
 * a piece of code that processes streams is known as an _operator_ or a _job_
 * stream never ends, so you can't sort it
 
- _job_
-* stream never ends, so you can't sort it
-
 ### Uses of Stream Processing
 * Stream processing has long been used for monitoring purposes:
   * Fraud Detection system (e.g. credit card usage)
   * Trading Systems. Make trades according to changes in financial markets
   * Manufacturing Systems. Monitor the status of machines in a factory.
   * Militry and inteligence systems. Track activities of potential aggressors. raise alarms if signs of attack. 
+
+### Complex event processing
+* _complex event processing_ is an approach developed in the 1990s for analyzing even streams
+  * geared towards apps the require searching for a certain event patterns
+  * similar to regex, CEP allows you to specify rules to search for certain patterns in event stream
+  * when a match is found, the engine emits a _complex event_ with the details
+
+### stream analytics
+* streamp processing used for analytics
+* analytics tend to be less interested in finding specific event sequences
+* more oriented towards aggregations and statistical metrics over a large number of events e.g.
+  * measuring rate of some type of event
+  * calculating the rolling average of a value
+  * comparing current statistics to previous time intervals
+
+### Maintaining materialized views
+* _materialized views_: an alternative view onto some datasets so that you can query it efficiently and update the view whenever underlying data changes
+* unlike stream analytics scenarious, it is usually not sufficient to consider only events within some time window
+  * need window that stretches all the way back to the beginning of time
+
+### Search on streams
+* Conventional search engines first index the documents and then run queries over the index.
+* searching a stream turns the processing on its head:
+  * queries are stored and documents run past the queries
+
+### Message passing and RPC
+* message passing is an alternative to RPC as a mechanism for services to communicate
+* although these systems are based on messages and events, we normally don't think of them as stream processors:
+  * actor frameworks are primary mechanisms for managing concurrency and distributed execution of communicating modules.
+    * stream processing is a data managment technique
+  * communication between actors is ephemeral and one-to-one. 
+    * event logs are durable with multiple subscribers
+  * actors can communicate in arbitrary ways
+    * stream processors are set up in acyclic piplines where every stream is the output of one particular job
+
+### Reasoning about time
+* many stream processing frameworks use the local system clock on the processing machine to determine windowing
+  * it is reasonable if the dleay b/w event creation and processing is negligible, breaks down delayed processing
+* many reasons for delayed processing:
+  * queuing, network faults, contention in message brokers, etc
+* message delays can also lead to unpredictable ordering of messages
+* confusing event time and processing time leads to bad data
+
+### Knowing when you're ready
+* when defining windows in terms of event time, you can never be sure when you have received all events for a particular window, or whether there are some vents still to come
+* can time out and declare window ready after some time with no new events but some events could just be delayed
+* you need to be able to handle such straggler events that arrive after the window has already been declared complete. Two options:
+  * ignore the straggler events: these are likely a small percentage of events in normal circumstances
+  * publish a correction: an updated value for window with stragglers included. can retract previous output
+
+### Whose clock are you using, anyway?
+* assigning timestamps to events is ahrd when events can be buffered at several points in the system
+  * mobile apps can be used when device is offline
+  * message can be sent when reconnected
+  * events will appear as extremely delayed stragglers
+* timestamps shoudlbe the time at which the user interaction occurred, idelly on device local clock
+* however the lcock in the user-controlled device cannot be trusted
+  * can be accidentally or deliberately set to the wrong time
+* to adjust for incorrect one approach is to log three timestamps:
+  * time at which event occurred according to device clock
+  * time at which event is sent to server according to device clock
+  * time at which the event is received by server according to device clock
+* subtracting 2 from 3 you can estimate the offset between the device clock and server clock
+  * with assumptions about minimal delays and no tampering in between events
+
+### Types of windows
+* Several types of windows in common use
+  * tumbling window:
+    * 3:00-3:59, 4:00-4:59
+  * hopping window:
+    * 3:00-7:59, 4:00-8:59
+  * sliding window:
+    * contains all events within some interval of each other
+  * session window:
+    * all events in a window until some level of inactivity
+  
+### Stream joins
+* 
