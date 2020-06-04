@@ -1542,3 +1542,39 @@ class NestedIterator:
       self.dq.extendleft(first.getList()[::-1])
     return False
 ```
+
+### 326 Power of Three
+`t: o(logn), s: o(1) n: how many times original n can be divided by 3`
+```python
+class Solution:
+  def isPowerOfThree(self, n):
+    if n == 0: return True
+    while n:
+      if n == 1: return True
+      if n % 3 != 0: return False
+      n /= 3
+    return False
+```
+
+### 334 Increasing Triplet Subsequence
+* first is always updated such that it can only go downwards
+* second is only updated if first is already update
+* e.g. i: [1, 3, 0, 5]
+  first: 1, -> 0
+  second: 3
+
+Solution:
+`T: o(n), S: o(1). n: len(nums)`
+```python
+class Solution:
+  def increasingTriplet(self, nums):
+    first = second = float('inf')
+    for n in nums:
+      if n <= first:
+        first = n
+      elif n <= second:
+        second = n
+      else:
+        return True
+    return False
+```
