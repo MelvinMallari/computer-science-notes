@@ -1578,3 +1578,28 @@ class Solution:
         return True
     return False
 ```
+### 237 Delete Node in a Linked List
+
+Solution:
+`T: o(1), S: o(1)`
+```python
+class Solution:
+  def deleteNode(self, node):
+    node.val = node.next.val
+    node.next = node.next.next
+```
+
+### 204 Count Primes
+
+```python
+class Solution:
+  def countPrimes(self, n):
+    if n < 3: return 0
+    primes = [1]*n
+    primes[0] = primes[1] = 0
+    for i in range(2, int(n**0.5) + 1):
+      if primes[i]:
+        for j in range(i*i, n, i):
+          primes[j] = 0
+    return sum(primes)
+```

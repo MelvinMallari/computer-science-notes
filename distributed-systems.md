@@ -1383,4 +1383,23 @@ Lots of things can go wrong in data systems:
     * all events in a window until some level of inactivity
   
 ### Stream joins
+* Say you have a search feature on your website and you want to detect recent trends in searched-for URLS
+  * every time someone clicks one of hte search results you can log another event recording the click
+  * to calculate the click-through results for each URL in the search results:
+    * you need to bring together the events for the search action and the click action which are connected by having the same session ID
+* To implement this type of join a stream processor needs to maintain state. e.g.
+  * events occurred in the last hour as indexed by session ID
+  * whenever a search event or click event occurs, it is added to the appropriate index
+  * stream processor checks the other index to see if another event for same session ID has arrived
+  * if matching id, emit an event saying which search result was clicked
+
+### Stream-table join
 * 
+
+### table-table join
+* in the case of the Twitter timeline,
+  * too expensive to iterate over all the people user is following and merge them
+  * instead we can a timeline cache, a per-user "inbox" to which tweets are written as they are sent
+    * makes reading the timeline a single lookup
+* to implement cache maintenance in a stream processor, you need a stream of events for tweets nad for follow relationships
+* stream process needs to maintain a database contains the set of followers for each user so that it knows which timelines need to be updated when a new tweet arives
