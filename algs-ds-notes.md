@@ -1603,3 +1603,29 @@ class Solution:
           primes[j] = 0
     return sum(primes)
 ```
+
+### 224 Basic Calculator
+
+`T: o(n), S: o(n). n: len(s)`
+```python
+class Solution:
+  def calculate(self, s):
+    res, num, sign, stack = 0, 0, 1, []
+    for ss in s:
+      if ss.isdigit():
+        num = num*10 + int(ss)
+      elif ss in '-+':
+        res += num*sign
+        num = 0
+        sign = 1 if ss == '+' else -1
+      elif ss == '(':
+        stack.append(res)
+        stack.append(sign)
+        res, sign = 0, 1
+      elif ss == ')':
+        res += num*sign
+        res *= stack.pop() # account for previous sign stored in stack
+        res += stack.pop() # account for previous result stored in stack
+        num = 0
+    return res + num*sign
+```
