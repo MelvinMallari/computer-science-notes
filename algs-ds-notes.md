@@ -3,6 +3,7 @@
 ## Resources
 
 [leetcode resources](https://leetcode.com/discuss/general-discussion/665604/important-and-useful-links-from-all-over-the-leetcode)
+[facebook q's](https://leetcode.com/discuss/general-discussion/675445/facebook-interview-experiences-all-combined-from-lc-till-date-07-jun-2020)
 
 ## 309 Best Time to Buy and Sell Stock with Cooldown
 
@@ -1628,4 +1629,29 @@ class Solution:
         res += stack.pop() # account for previous result stored in stack
         num = 0
     return res + num*sign
+```
+
+### 227 Basic Calculator II
+* stack 
+
+Solution:
+`T: o(n), S: o(n). n: len(s)`
+```python
+class Solution:
+  def calculate(self, s):
+    num, prevSign, stack = 0, '+', []
+    for i, ss in enumerate(s):
+      if ss.isdigit():
+        num = num*10 + int(ss)
+      if ss in '-+*/' or i == len(s) - 1:
+        if prevSign == '-':
+          stack.append(-num)
+        elif prevSign == '+':
+          stack.append(num)
+        elif prevSign == '*':
+          stack.append(stack.pop()*num)
+        else:
+          stack.append(int(stack.pop()/num))
+        num, prevSign = 0, ss
+    return sum(stack)
 ```

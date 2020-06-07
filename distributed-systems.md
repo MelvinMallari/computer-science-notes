@@ -1403,3 +1403,73 @@ Lots of things can go wrong in data systems:
     * makes reading the timeline a single lookup
 * to implement cache maintenance in a stream processor, you need a stream of events for tweets nad for follow relationships
 * stream process needs to maintain a database contains the set of followers for each user so that it knows which timelines need to be updated when a new tweet arives
+
+### Fault Tolerance
+* if a task in a MapReduce job fails, it can simply be started again on another machine, and the output of the failed task is discarded
+* waiting until task is finished before making its output visible is not an option, because stream is infinite
+* one solution is to brak uthe stream into small blocks and treat each block like a mini batch process- a process called _microbatching_
+* another solution is to periodically generate rolling check points of state and write them to durable storage
+* microbatching and checkpointing provide the same exactly once sematnics as batch processing
+  * however as soon as output leaves stream processor, the framework is no longer able to discard output of failed batch
+    * restarting a failed task cause external side effect to happen twice
+
+### atomic commit revisited
+* in order to give the appearance of exactly once-processing in the presence of faults
+  * need to ensure all outputs and side effects of processing take effect if and only if the processing is succesful
+
+### Idempotence
+* an idempotent transaction is one that you can perform multiple times and it has the same effect of being performed only once
+  * e.g. setting a key in a key-value store to some fixed value
+* even if an operation is not naturally idempotent, it can often be made idempotent with a bit of extra metadata.
+  * e.g. when consuming message from Kafka, every message has a persistent monotically increasing offset
+    * when writing a value to an external db, you can include the offset of the message that triggered the last write with the value
+    * thus you can tell whether an update has already been applied and avoid performing the same update
+* idempotence implies several assumptions: 
+  * restarting a failed task must replay the same messages in the same order
+  * process must be deterministic
+  * no other node may concurrenly update the same value
+
+### Rebuilding state after a failure
+* any steram process that requires state must ensure that this state can be recovered after failure
+* one options is to keep the state in a remote datastore and replicate it - although this can be slow by nature of remote queries
+* in some cases it may not be necessary to replicate state because it can rebuilt from input streams
+
+
+### Chapter 9 Summary
+* In some ways, stream processing is very much like batch processing but done continuously on unbounded streams rather than on fixed-size input
+  * From this perspective, message brokers and event logs serve as the steraming equivalent of a file system
+* Two types of message brokers
+  * AMQP/JMS-style message broker
+    * broker assigns individual messages to consumers. consumers acknowledge individual messages when they have been successfully processed.
+    * message deleted from broker once they have been acknowledged
+    * appropriate as an async form of RPC
+      * e.g. task queue where exact order of message processing is not important and where there is no need to go back and read old messages after they have been processed
+  * Log-based message broker
+    * broker assigns all messages in a partition to the same consumer node and always deliver message in the same order.
+    * parallelism achieved through partioning 
+    * consumers track their progress by checkpointing the offset of the last message they have processed
+    * broker retains messages on disk, so it is possible to jump back and reread old messages if necessary
+* Where do streams come from?
+  * user activity events, periodic readings, data feeds
+* several purposes of stream processing including
+  * serching for event patterns (complex event processing)
+  * computing windowed aggregations (stream analytics)
+  * keeping dervied data systems up to date (materialized view)
+
+Three Types of stream process joins:
+* stream-stream joins:
+  * both input streams consist of activity events
+  * join operators searches for related events that occur within some window of time
+  * e.g. may take two actions taken by same user within 30 minutes of each other
+  * two join inputs may be the same stream i fyou want to find related events within that one stream
+* stream-table joins:
+  * one input stream of activity events, other database change log
+  * changelog keeps a local copy of db up to date
+  * for each activity event, join operator queries db and outputs enriched activity event
+* table-table joins:
+  * both input streams are database changelogs. 
+  * every change on one side is joined with the latest state of the other side
+  * result is a stream of changes to materialized view of the join between two tables
+* as with batch processing, we need to discard partial output of any failed tasks
+* since stream processing is ongoing, can't simply discard all output
+* sintead finer grained recovery mechanism can be used based on microbatching, checkpointing, transactions or idempotent writes
