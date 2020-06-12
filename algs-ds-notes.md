@@ -1655,3 +1655,15 @@ class Solution:
         num, prevSign = 0, ss
     return sum(stack)
 ```
+
+### 172 Factorial Trailing Zeroes
+
+```python
+class Solution:
+  def trailingZeroes(self, n):
+    res = 0
+    while n:
+      res += n // 5
+      n //= 5
+    return res
+```
