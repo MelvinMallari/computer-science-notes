@@ -676,7 +676,12 @@ class Solution:
 * dynamic programming
 * state equations:
   * `if 0 < int(s[i-1:i]): dp[i] += dp[i-1]` represents a match of number within [1, 9]
-  * `if 10 <= int(s[i-2:i]) <= 26: tmpCurr += prev` represents a match of number within [10, 16]
+  * `if 10 <= int(s[i-2:i]) <= 26: tmpCurr += prev` represents a match of number within [10, 26]
+
+  * `prev = curr = 1`
+  * `tmpCurr = 0`
+  * `if 0 < int(s[i-1:i]): tmpCurr += curr` represents a match of number within [1, 9]
+  * `if 10 <= int(s[i-2:i]) <= 26: tmpCurr += prev` represents a match of number within [10, 26]
 
 **Base Case**
 * `dp[0] = 1` case where there is a single match gives one possibility
@@ -766,7 +771,7 @@ class Solution:
     return [1] + digits
 ```
 
-### 144 Binary Tree Preorder Traversal
+## 144 Binary Tree Preorder Traversal
 `T: o(n), s: o(n) n: num nodes`
 ```python
 class Solution:
@@ -781,7 +786,7 @@ class Solution:
     return res
 ```
 
-### 103 Binary Tree Zig Zag Level Order Traversal
+## 103 Binary Tree Zig Zag Level Order Traversal
 Solution I came up with:
 `T: o(n), s: o(n) n: num nodes`
 ```python
@@ -1338,7 +1343,7 @@ class Solution:
     return res
 ```
 
-### 384 Shuffle an Array
+## 384 Shuffle an Array
 
 Solution:
 `T: o(n), S: o(1). n: len(nums)`
@@ -1358,7 +1363,7 @@ class Solution:
     return res
 ```
 
-### 380 Insert Delete GetRandom O(1)
+## 380 Insert Delete GetRandom O(1)
 
 Solution:
 `T: o(1), S: o(n). n: len(nums)`
@@ -1391,7 +1396,7 @@ class RandomizedSet:
 ```
 
 
-### 378 Kth Smallest in a Sorted Matrix
+## 378 Kth Smallest in a Sorted Matrix
 Solution 1:
 `t: o(min(k,n)*klog(n)) s: min(k, n). n: len(matrix)`
 ```python
@@ -1440,7 +1445,7 @@ class Solution:
     return count, smaller, larger
 ```
 
-### 328 Odd Even Linked List
+## 328 Odd Even Linked List
 * two pointers, weaving through linked list
 * point the odd list to the even list
 ```python
@@ -1457,7 +1462,7 @@ class Solution:
     return oddH
 ```
 
-### 350 Intersection of Two Arrays II
+## 350 Intersection of Two Arrays II
 Solution 1:
 `t: o(n), s: o(m). n: len(nums1), m: len(nums2)`
 ```python
@@ -1490,7 +1495,7 @@ class Solution:
     return res
 ```
 
-### 341 Flatten Nested Iterator
+## 341 Flatten Nested Iterator
 
 Solution 1:
 `t: o(max(m, n)) s: o(n) n: len(list) m: largest amount of nesting`
@@ -1545,7 +1550,7 @@ class NestedIterator:
     return False
 ```
 
-### 326 Power of Three
+## 326 Power of Three
 `t: o(logn), s: o(1) n: how many times original n can be divided by 3`
 ```python
 class Solution:
@@ -1558,7 +1563,7 @@ class Solution:
     return False
 ```
 
-### 334 Increasing Triplet Subsequence
+## 334 Increasing Triplet Subsequence
 * first is always updated such that it can only go downwards
 * second is only updated if first is already update
 * e.g. i: [1, 3, 0, 5]
@@ -1580,7 +1585,7 @@ class Solution:
         return True
     return False
 ```
-### 237 Delete Node in a Linked List
+## 237 Delete Node in a Linked List
 
 Solution:
 `T: o(1), S: o(1)`
@@ -1591,7 +1596,7 @@ class Solution:
     node.next = node.next.next
 ```
 
-### 204 Count Primes
+## 204 Count Primes
 
 ```python
 class Solution:
@@ -1606,7 +1611,7 @@ class Solution:
     return sum(primes)
 ```
 
-### 224 Basic Calculator
+## 224 Basic Calculator
 
 `T: o(n), S: o(n). n: len(s)`
 ```python
@@ -1632,7 +1637,7 @@ class Solution:
     return res + num*sign
 ```
 
-### 227 Basic Calculator II
+## 227 Basic Calculator II
 * stack 
 
 Solution:
@@ -1657,7 +1662,7 @@ class Solution:
     return sum(stack)
 ```
 
-### 172 Factorial Trailing Zeroes
+## 172 Factorial Trailing Zeroes
 
 ```python
 class Solution:
@@ -1669,7 +1674,7 @@ class Solution:
     return res
 ```
 
-### 324 Wiggle Sort II
+## 324 Wiggle Sort II
 * sort the array
 * odd positions to be the reverse of the first half of array
 * even positions to be the reverse of the second half of array
@@ -1682,7 +1687,7 @@ class Solution:
     nums[::2], nums[1::2] = nums[:half][::-1], nums[half:][::-1]
 ```
 
-### 146 LRU Cache
+## 146 LRU Cache
 * use hashtable and doubly linked list
 * Hashtable {key: Node}
 * self.head side represents the Least Recently Used
@@ -1736,7 +1741,7 @@ class LRUCache:
     n.next.prev = n.prev
 ```
 
-### 56 Merge Intervals
+## 56 Merge Intervals
 * merge all overlapping intervals given array of intervals, `intervals`
 ```python
 class Solution:
@@ -1755,7 +1760,7 @@ class Solution:
     return res
 ```
 
-### 57 Insert Intervals
+## 57 Insert Intervals
 ```python
 class Solution:
   def insert(self, intervals, newInterval):
@@ -1778,7 +1783,7 @@ class Solution:
     return res
 ```
 
-### 540 Single Element in a Sorted Array
+## 540 Single Element in a Sorted Array
 
 ```python
 class Solution:
@@ -1791,5 +1796,101 @@ class Solution:
       else:
         r = m
     return nums[l]
+```
+
+## How to deal with Buy and Sell stock problems
+* Base Cases
+```
+T[-1][k][0] = T[i][0][0] = 0
+T[-1][k][1] = T[i][0][1] = -Infinity
+```
+  
+* General Recurrence Relationship
+```
+T[i][k][0] = max(T[i][k][0], T[i-1][k][1] + prices[i])
+T[i][k][1] = max(T[i][k][1], T[i-1][k-1][0] - prices[i])
+```
+
+**Notation**
+* `i`: `ith` day
+* `k`: at most `k` transactions
+* `prices[i]`: price of stock at `ith` day
+* `[0]`: holding 0 stock end of day
+* `[1]`: holding 1 stock end of day
+* `T[i][k][0]`: Most profit on `ith` day, with at most `k` transactions, holding `0` stock EOD
+* `T[i][k][1]`: Most profit on `ith` day, with at most `k` transactions, holding `1` stock EOD
+
+**Explanation**
+* Base Cases:
+  * `T[-1][k][0] = T[i][0][0] = 0`: because holding 0 stocks in the beginning means 0 profit
+  * `T[-1][k][1] = T[i][0][1] = -Infinity`: because having 1 stock to start off with is impossible
+
+* We want a relationship between the `T[i][k][0/1]` and its sub-problems `T[i-1][k][0/1], T[i][k-1][0/1], T[i-1][k-1][0/1]...`
+* If we have this relationship we can solve the problem with dynamic programming (since the relationship is recursive)
+
+### 121 Best Time to Buy and Sell Stock
+`Case 1: k = 1`
+
+* Recurrence Relationships
+```
+  T[i][1][0] = max(T[i][1][0], T[i][1][1] + prices[i])
+  T[i][1][1] = max(T[i][1][1], T[i][0][0] - prices[i]) = max(T[1][1][0], -prices[i])
+```
+
+`t: o(n), s: o(1). n: len(prices)`
+```python
+class Solution:
+  def maxProfit(self, prices):
+    t_i10, t_i11 = 0, float('-inf')
+    for p in prices:
+      t_i10, t_i11 = max(t_i10, t_i11+p), max(t_i11, -p)
+    return t_i10
+```
+
+### 122 Best Time to Buy and Sell Stock II
+`Case 2: k = Infinity`
+
+* Recurrence Relationships
+```
+  T[i][k][0] = max(T[i][k[0], T[i][k][1] + prices[i])
+  T[i][k][1] = max(T[i][k][1], T[i][k-1][0] - prices[i]) = max(T[i][k][1], T[i][k][0] - prices[i])
+```
+* Note: 
+  * if `k = Infinity`: `T[i][k-1][0] = T[i][k][0]`
+  * this is because as lim(k) approaching infinity is the same as lim(k-1) approaching infinity
+
+`t: o(n), s: o(1). n: len(prices)`
+```python
+class Solution:
+  def maxProfit(self, prices):
+    t_ik0, t_ik1 = 0, float('-inf')
+    for p in prices:
+      t_ik0, t_ik1 = max(t_ik0, t_ik1 + p), max(t_ik1, t_ik0-p)
+    return t_ik0
+```
+
+### 123 Best Time to Buy and Sell Stock III
+`Case 3: k = 2`
+
+* Recurrence Relationships
+```
+  T[i][2][0] = max(T[i][2][0], T[i][2][1] + prices[i])
+  T[i][2][1] = max(T[i][2][1], T[i][1][1] - prices[i])
+  T[i][1][0] = max(T[i][1][0], T[i][1][1] + prices[i])
+  T[i][1][1] = max(T[i][1][1], T[i][0][1] - prices[i]) = max(T[i][1][1], -prices[i])
+```
+
+`t: o(n), s: o(1). n: len(prices)`
+```python
+class Solution:
+  def maxProfit(self, prices):
+    t_i20 = t_i10 = 0
+    t_i21 = t_i11 = float('-inf')
+    for p in prices:
+      t_i20 = max(t_i20, t_i21 + p)
+      t_i21 = max(t_i21, t_i10 - p)
+      t_i10 = max(t_i10, t_i11 + p)
+      t_i11 = max(t_i11, -p)
+    return t_i20
 ```
 
