@@ -4,6 +4,7 @@
 
 [leetcode resources](https://leetcode.com/discuss/general-discussion/665604/important-and-useful-links-from-all-over-the-leetcode)
 [facebook q's](https://leetcode.com/discuss/general-discussion/675445/facebook-interview-experiences-all-combined-from-lc-till-date-07-jun-2020)
+[amazon online assesments](https://leetcode.com/discuss/interview-question/344650/Amazon-Online-Assessment-Questions)
 
 ## 309 Best Time to Buy and Sell Stock with Cooldown
 
@@ -40,7 +41,7 @@ class Solution:
       s2[i] = s1[i-1] + prices[i]
     return max(s0[-1], s2[-1])
 ```
-Solution 1:
+Solution 2:
 `T: o(n), S: o(1)`
 * Notice that that all the states only depend on their previous value. We can reduce our memory consumption by using variables instead.
 ```python
@@ -1667,3 +1668,128 @@ class Solution:
       n //= 5
     return res
 ```
+
+### 324 Wiggle Sort II
+* sort the array
+* odd positions to be the reverse of the first half of array
+* even positions to be the reverse of the second half of array
+
+```python
+class Solution:
+  def wiggleSort(self, nums):
+    nums.sort()
+    half = len(nums[::2])
+    nums[::2], nums[1::2] = nums[:half][::-1], nums[half:][::-1]
+```
+
+### 146 LRU Cache
+* use hashtable and doubly linked list
+* Hashtable {key: Node}
+* self.head side represents the Least Recently Used
+* self.tail side repesents the Most Recently Used
+* Node {key, val}
+
+```python
+class Node:
+  def __init__(self, key, val):
+    self.key = key
+    self.val = val
+    self.next = None
+    self.prev = None
+
+class LRUCache:
+  def __init__(self, capacity):
+    self.capacity = capacity
+    self.d = dict()
+    self.head = Node(0, 0)
+    self.tail = Node(0, 0)
+    self.head.next = self.tail
+    self.tail.prev = self.head
+  
+  def get(self, key): 
+    if key in self.d:
+      n = self.d[key]
+      self._remove(n)
+      self._add(n)
+      return n.val
+    return -1
+
+  def put(self, key, val):
+    if key in self.d: self._remove(self.d[key])
+    n = Node(key, val)
+    self._add(n)
+    self.d[key] = n
+    if len(self.d) > self.capacity:
+      lru = self.head.next
+      self._remove(lru)
+      del self.d[lru.key]
+
+  def _add(self, n):
+    prev = self.tail.prev
+    prev.next = n
+    n.prev = prev
+    n.next = self.tail
+    self.tail.prev = n
+
+  def _remove(self, n):
+    n.prev.next = n.next
+    n.next.prev = n.prev
+```
+
+### 56 Merge Intervals
+* merge all overlapping intervals given array of intervals, `intervals`
+```python
+class Solution:
+  def merge(self, intervals):
+    if not intervals: return
+    res = []
+    intervals = sorted(intervals, key = lambda x: x[0])
+    least, greatest = intervals[0]
+    for start, end in intervals[1:]:
+      if start <= greatest:
+        greatest = max(greatest, end)
+      else:
+        res.append([least, greatest])
+        least, greatest = start, end
+    res.append([least, greatest])
+    return res
+```
+
+### 57 Insert Intervals
+```python
+class Solution:
+  def insert(self, intervals, newInterval):
+    i, res = 0, []
+
+    while i < len(intervals) and intervals[i][1] < newInterval[0]:
+      res.append(intervals[i])
+      i += 1
+
+    while i < len(intervals) and intervals[i][0] <= newInterval[1]:
+      newInterval = min(newInterval[0], intervals[i][0]), max(newInterval[1], intervals[i][1])
+      i += 1
+
+    res.append(newInterval)
+
+    while i < len(intervals):
+      res.append(intervals[i])
+      i += 1
+
+    return res
+```
+
+### 540 Single Element in a Sorted Array
+
+```python
+class Solution:
+  def singleNonDuplicate(self, nums):
+    l, r = 0, len(nums) - 1
+    while l < r:
+      m = (l + r) // 2
+      if m % 2 == 0 and nums[m] == nums[m+1] or m % 2 == 1 and nums[m] == nums[m-1]:
+        l = m + 1
+      else:
+        r = m
+    return nums[l]
+```
+
