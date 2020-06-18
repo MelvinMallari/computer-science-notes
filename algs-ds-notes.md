@@ -1837,7 +1837,7 @@ T[i][k][1] = max(T[i][k][1], T[i-1][k-1][0] - prices[i])
   T[i][1][1] = max(T[i][1][1], T[i][0][0] - prices[i]) = max(T[1][1][0], -prices[i])
 ```
 
-`t: o(n), s: o(1). n: len(prices)`
+Solution:`t: o(n), s: o(1). n: len(prices)`
 ```python
 class Solution:
   def maxProfit(self, prices):
@@ -1857,9 +1857,9 @@ class Solution:
 ```
 * Note: 
   * if `k = Infinity`: `T[i][k-1][0] = T[i][k][0]`
-  * this is because as lim(k) approaching infinity is the same as lim(k-1) approaching infinity
+  * this is because as lim(k) approaching infinity is the same as lim(k-1) approaching infinityA
 
-`t: o(n), s: o(1). n: len(prices)`
+Solution:`t: o(n), s: o(1). n: len(prices)`
 ```python
 class Solution:
   def maxProfit(self, prices):
@@ -1880,7 +1880,7 @@ class Solution:
   T[i][1][1] = max(T[i][1][1], T[i][0][1] - prices[i]) = max(T[i][1][1], -prices[i])
 ```
 
-`t: o(n), s: o(1). n: len(prices)`
+Solution:`t: o(n), s: o(1). n: len(prices)`
 ```python
 class Solution:
   def maxProfit(self, prices):
@@ -1894,3 +1894,57 @@ class Solution:
     return t_i20
 ```
 
+### 188 Best Time to Buy and Sell Stock IV
+`Case 4: k is arbitrary`
+* given that there are n stocks (len(prices))
+  * there can only be at most n/2 profitable transactions
+  * if k >= n/2, this scenario models exactly like case II (infinite transactions possible)
+* otherwise we have to consider the states of possible transactions leading up to k 
+
+`t:o(kn) s:o(k), k:k, n: len(prices)`
+```python
+class Solution:
+  def maxProfit(self, prices, k):
+    if k >= len(prices) // 2:
+      tik0, tik1 = 0, float('-inf')
+      for p in prices:
+        tik0, tik1 = max(tik0, tik1 + p), max(tik1, tik0 - p)
+      return tik0
+    tik0, tik1 = [0]*(k+1), [float('-inf')]*(k+1)
+    for p in prices:
+      for j in range(k, 0, -1):
+        tik0[j] = max(tik0[j], tik1[j] + p)
+        tik1[j] = max(tik1[j], tik0[j-1] - p)
+    return tik0[k]
+```
+
+### 309 Best Time to Buy and Sell Stock with Cooldown
+`Case 5: k is Infinite but with cooldown`
+
+* same as case II but we have consider `i-2`th day instead of `i-1`th date when we consider a transaction (during a buy)
+
+Solution: `t:o(n) s:o(1), n: len(prices)`
+```python
+class Solution:
+  def maxProfit(self, prices):
+    tik0Pre, tik0, tik1 = 0, 0, float('-inf')
+    for p in prices:
+      tik0Old = tik0
+      tik0, tik1 = max(tik0, tik1 + p), max(tik1, tik0Pre - p)
+      tik0Pre = tik0Old
+    return tik0
+```
+
+### 714 Best Time to Buy and Sell Stock with Transaction Fee
+`Case 6: k is Infinite but with fee`
+* similar to case II, but with fee
+
+Solution: `t:o(n) s:o(1), n: len(prices)`
+```python
+class Solution:
+  def maxProfit(self, prices, fee):
+    tik0, tik1 = 0, float('-inf')
+    for p in prices:
+      tik0, tik1 = max(tik0, tik1 + p), max(tik1, tik0 - p - fee)
+    return tik0
+```
