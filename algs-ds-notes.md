@@ -4,7 +4,7 @@
 
 [leetcode resources](https://leetcode.com/discuss/general-discussion/665604/important-and-useful-links-from-all-over-the-leetcode)
 [facebook q's](https://leetcode.com/discuss/general-discussion/675445/facebook-interview-experiences-all-combined-from-lc-till-date-07-jun-2020)
-[amazon online assesments](https://leetcode.com/discuss/interview-question/344650/Amazon-Online-Assessment-Questions)
+[amazon online assessments](https://leetcode.com/discuss/interview-question/344650/Amazon-Online-Assessment-Questions)
 
 ## 309 Best Time to Buy and Sell Stock with Cooldown
 
@@ -1947,4 +1947,142 @@ class Solution:
     for p in prices:
       tik0, tik1 = max(tik0, tik1 + p), max(tik1, tik0 - p - fee)
     return tik0
+```
+
+## 278 First Bad Version
+Solution: `t:o(n), s:o(1). n: n`
+```python
+class Solution:
+  def firstBadVersion(self, n):
+    i, j = 0, n
+    while i < j:
+      m = (i + j) // 2
+      while i < j:
+        if isBadVersion(m):
+          j = m
+        else:
+          i = m + 1
+    return i
+```
+
+
+## 38 Combination Sum
+* we're given a set of candidates with no duplicates (we don't have to sort)
+* (1) can reuse the numbers
+
+```python
+class Solution:
+  def combinationSum(self, candidates, target):
+    res = []
+    self.backtrack(res, candidates, target, [], 0)
+    return res
+
+  def backtrack(self, res, candidates, target, path, index):
+    if target < 0: return
+    if target == 0:
+      res.append(path)
+      return
+    for i in range(index, len(candidates)):
+      self.backtrack(res, candidates, target-candidates[i], path+[candidates[i]], i) # (1)
+```
+
+## 39 Combination Sum 2
+* we are given duplicates
+* only allowed to use numbers once
+
+```python
+class Solution:
+  def combinationSum2(self, candidates, target):
+    res = []
+    self.backtrack(res, sorted(candidates), target, [], 0)
+    return res
+
+  def backtrack(self, res, candidates, target, path, index):
+    if target < 0: return
+    if target == 0:
+      res.append(path)
+      return
+    for i in range(index, len(candidates)):
+      if i > index and candidates[i] == candidates[i-1]: continue
+      self.backtrack(res, candidates, target-candidates[i], path+[candidates[i]], i+1)
+```
+
+## 77 Combinations
+```python
+class Solution:
+  def combine(self, n, k):
+    res = []
+    self.backtrack(res, n, k, [],  1)
+    return res
+
+  def backtrack(self, res, n, k, path, index):
+    if len(path) == k:
+      res.append(path)
+      return
+    for i in range(index, n+1):
+      self.backtrack(res, n, k, path+[i], i+1)
+```
+
+## 78 Subsets
+```python
+class Solution:
+  def subsets(self, nums):
+    res = []
+    self.backtrack(res, nums, [], 0)
+    return res
+
+  def backtrack(self, res, nums, path, index):
+    res.append(path)
+    for i in range(index, len(nums)):
+      self.backtrack(res, nums, path+[nums[i]], i+1)
+```
+
+## 90 Subsets II
+```python
+class Solution:
+  def subsetsWithDup(self, nums: List[int]) -> List[List[int]]:
+    res = []
+    self.backtrack(sorted(nums), res, [], 0)
+    return res
+    
+  def backtrack(self, nums, res, path, index):
+    res.append(path)
+    for i in range(index, len(nums)):
+      if i > index and nums[i] == nums[i-1]: continue
+      self.backtrack(nums, res, path+[nums[i]], i+1))
+```
+
+## 46 Permutations
+```python
+class Solution:
+  def permute(self, nums):
+    res = []
+    self.backtrack(res, nums, [])
+    return res
+
+  def backtrack(self, res, nums, path):
+    if not nums:
+      res.append(path)
+      return
+    for i in range(len(nums)):
+      self.backtrack(res, nums[:i]+nums[i+1:], path+[nums[i]])
+```
+
+## 47 Permutations II
+```python
+class Solution:
+  def permuteUnique(self, nums):
+    res = []
+    self.backtrack(res, sorted(nums), [], [False]*len(nums))
+    return res
+
+  def backtrack(self, res, nums, path, used):
+    if len(path) == len(nums):
+      res.append(path)
+      return
+    for i in range(len(nums)):
+      if used[i] or (i > 0 and nums[i] == nums[i-1] and not used[i-1]): continue
+      used[i] = True
+      self.backtrack(res, nums, path+[nums[i]], used)
+      used[i] = False
 ```
