@@ -2086,3 +2086,44 @@ class Solution:
       self.backtrack(res, nums, path+[nums[i]], used)
       used[i] = False
 ```
+
+## 60 Permutations Sequence
+
+* given n and k, we want to give the kth permutation
+* you can build the kth permutation without building all permutations
+
+Solution:
+`t:o(n) s:o(n). n: given n`
+```python
+class Solution:
+  def getPermutation(self, n, k):
+    nums = [str(i) for i in range(1, n+1)]
+    fact = [1]*n
+    for i in range(1, n):
+      fact[i] = i*fact[i-1]
+    k -= 1 
+    res = []
+    for i in range(n, 0, -1):
+      j = k // fact[i-1]
+      k %= fact[i-1]
+      res.append(nums[j])
+      nums.pop(j)
+    return ''.join(res)
+```
+
+## 131 Palindrome Paritioning
+```python
+class Solution:
+  def partition(self, s):
+    res = []
+    self.backtrack(s, res, [])
+    return res
+
+  def backtrack(self, s, res, path):
+    if not s:
+      res.append(path)
+      return
+    for i in range(1, len(s)+1):
+      if s[:i] == s[:i][::-1]:
+        self.bactrack(s[i:], res, path+[s[:i]])
+```
