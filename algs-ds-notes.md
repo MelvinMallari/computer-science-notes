@@ -2111,19 +2111,69 @@ class Solution:
     return ''.join(res)
 ```
 
-## 131 Palindrome Paritioning
+## 367 Valid Perfect Squares
 ```python
 class Solution:
-  def partition(self, s):
-    res = []
-    self.backtrack(s, res, [])
-    return res
+  def isPerfectSquare(self, num):
+    l, r = 0, num
+    while l <= r:
+      m = (l+r)//2
+      if m*m == num: return True
+      if m*m > num:
+        r = m - 1
+      else:
+        l = m + 1
+    return False
+```
 
-  def backtrack(self, s, res, path):
-    if not s:
-      res.append(path)
-      return
-    for i in range(1, len(s)+1):
-      if s[:i] == s[:i][::-1]:
-        self.bactrack(s[i:], res, path+[s[:i]])
+## 383 Ransom Notes
+```python
+class Solution:
+  def canConstruct(self, ransomNote, magazine):
+    count = collections.Counter(magazine)
+    for l in ransomeNote:
+      if count[l] == 0: return False
+      count[l] -= 1
+    return True
+```
+
+## 402 Remove K Digits
+* one way to think about this is if we have a set of sorted digits "123456789"
+  * to remove k digits and get the smallest number, start removing k digits from the right
+* if we don't have a sorted set of digits, then prioritize the removal numbers that don't fulfill that criteria
+
+```python
+class Solution:
+  def removeKdigits(self, num, k):
+    stack = []
+    for n in num:
+      while k > 0 and len(stack) > 0 and stack[-1] > n:
+        stack.pop()
+        k -= 1
+      stack.append(n)
+    if k > 0: stack = stack[:-k]
+    return "".join(stack).lstrip("0") or "0"
+```
+
+## 525 Contiguous Array
+```python
+class Solution:
+  def findMaxLength(self, nums):
+    count = maxLength = 0
+    seen = {count:-1}
+    for i, n in enumerate(nums):
+      count += 1 if n == 1 else -1
+      if count in seen:
+        maxLength = max(maxLength, i-seen[count])
+      else:
+        seen[count] = i
+    return maxLength
+```
+
+## 451 Sort Characters by Frequency
+```python
+class Solution:
+  def frequencySort(self, s):
+    freq = sorted(collections.Counter(s).items(), key=lambda x: x[1], reverse=True)
+    return "".join(l*f for l, f in freq)
 ```
