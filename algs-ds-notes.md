@@ -2177,3 +2177,108 @@ class Solution:
     freq = sorted(collections.Counter(s).items(), key=lambda x: x[1], reverse=True)
     return "".join(l*f for l, f in freq)
 ```
+
+## 1008 Construct Binary Search Tree from Preorder Traversal
+Solution 1 (iterative):
+`t:o(n^2), s:o(n)`
+```python
+class Solution:
+  def bstFromPreorder(self, preorder):
+    root = TreeNode(preorder[0])
+    stack = [root]
+    for val in preorder[1:]:
+      if val < stack[-1].val:
+        stack[-1].left = TreeNode(val)
+        stack.append(stack[-1].left)
+      else:
+        while stack and stack[-1].val < val: 
+          last = stack.pop()
+        last.right = TreeNode(val)
+        stack.append(last.right)
+    return root
+```
+Solution 2 (recursive):
+`t:o(n^2), s:o(n)`
+```python
+class Solution:
+  def bstFromPreorder(self, preorder):
+    if not preorder: return
+    root, i = TreeNode(preorder[0]), 1
+    while i < len(preorder) and preorder[i] < root.val: i += 1
+    root.left = self.bstFromPreorder(preorder[1:i])
+    root.right = self.bstFromPreorder(preorder[i:])
+    return root
+```
+
+## 993 Cousins in Binary Tree
+* all nodes have a unique integer val
+* BFS
+* we check if children both exists and are x and y -> return False
+* if vals x and y exist in the same level and are sibilings -> return True
+```python
+class Solution:
+  def isCousins(self, root, x, y):
+    level = [root]
+    while level:
+      leaves, vals = [], set()
+      for n in level:
+        if self.sibs(n, x, y): return False
+        if n.left:
+          leaves += n.left,
+          vals.add(n.left.val)
+        if n.right:
+          leaves += n.right,
+          vals.add(n.right.val)
+      if x in vals and y in vals: return True
+      level = leaves
+    return False
+
+  def sibs(self, n, x, y):
+    return n.left and n.right and n.left.val in (x, y) and n.right.val in (x, y)
+```
+
+## 560 Subarray Sums Equals K
+* 
+```python
+class Solution:
+  def subarraySum(self, nums: List[int], k: int) -> int:
+    currSum = res = 0
+    preSum = {0:1}
+    for n in nums:
+      currSum += n
+      res += preSum.get(currSum-k, 0)
+      preSum[currSum] = preSum.get(currSum, 0) + 1
+    return res
+```
+## 1232 Check if it is a Straight Line
+```python
+class Solution:
+  def checkStraightLine(self, coordinates):
+    slope = self.slope(coordinates[0], coordinates[1])
+    for i in range(1, len(coordinates)-1):
+      if self.slope(coordinates[i], coordinates[i+1]) != slope: return False
+    return True
+
+  def slope(self, p1, p2):
+    if p2[0] - p1[0] == 0: return float('inf')
+    return (p2[1] - p1[1]) / (p2[0] - p1[0])
+```
+
+## 218 The Skyline Problem
+`t: o(nlogn), s:`
+```python
+from heapq import heappop, heappush
+class Solution:
+  def getSkyline(self, buildings: List[List[int]]) -> List[List[int]]:
+    events = [(l, -h, r) for l, r, h in buildings] # starting events
+    events += list(set((r, 0, 0) for _, r, _ in buildings)) # ending events
+    events.sort() # sort events based on occurence
+
+    res = [[0,0]] #[x, height]
+    live = [(0, float('inf'))] #(height, endPos)
+    for pos, negH, r in events:
+      while live[0][1] <= pos: heappop(live)
+      if negH: heappush(live, (negH, r))
+      if res[-1][1] != -live[0][0]: res += [pos, -live[0][0]],
+    return res[1:]
+```
