@@ -2282,3 +2282,84 @@ class Solution:
       if res[-1][1] != -live[0][0]: res += [pos, -live[0][0]],
     return res[1:]
 ```
+## 437. Path Sum III
+
+## 73 Daily Temperatures
+* stack 
+```python
+class Solution:
+  def dailyTemperatures(self, T):
+    res, stack = [0]*len(T), []
+    for i, t in enumerate(T):
+      while stack and T[stack[-1]] < t: 
+        curr = stack.pop()
+        res[curr] = i - curr
+      stack += i,
+    return res
+```
+
+## 901 Online Stock Span
+* stack
+```python
+class StockSpanner:
+  def __init__(self):
+    self.stack = []
+  
+  def next(self, price):
+    res = 1
+    while self.stack and self.stack[-1][0] <= price: res += self.stack.pop()[1] 
+    self.stack.append((price, res))
+    return res
+```
+
+## 84 Largest Rectangle in Histogram
+```python
+class Solution:
+  def largestRectangleArea(self, heights):
+    heights += 0,
+    stack, res = [-1], 0
+    for i, height in enumerate(heights):
+      while height < heights[stack[-1]]:
+        h = heights[stack.pop()]
+        w = i-1 - stack[-1]
+        res = max(res, w*h)
+      stack += i,
+    return res
+```
+
+
+## 406 Queue Reconstruction By Height
+```python
+class Solution:
+  def reconstructQueue(self, people):
+    if not people: return people
+    res, heights, pplDict = [], [], collections.defaultdict(list)
+    for h, k in people:
+      if not pplDict[h]: heights += h,
+      pplDict[h] += k,
+    for h in sorted(heights, reverse=True):
+      for k in sorted(pplDict[h]):
+        res.insert(k, [h, k])
+    return res
+```
+
+
+## 621 Task Scheduler
+```python
+from heapq import heapify, heappop, heappush
+class Solution:
+  def leastInterval(self, tasks, n):
+    heap, intervals = [-v for v in collections.Counter(tasks).values()], 0
+    heapify(heap)
+    while heap:
+      steps, tmp = 0, []
+      while steps <= n:
+        intervals += 1
+        steps += 1
+        if heap:
+          freq = heappop(heap)
+          if freq < -1: tmp += freq + 1,
+        if not heap and not tmp: break
+      for i in tmp: heappush(heap, i)
+    return intervals
+```
