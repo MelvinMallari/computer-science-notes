@@ -2363,3 +2363,58 @@ class Solution:
       for i in tmp: heappush(heap, i)
     return intervals
 ```
+
+## 918 Maximum Sum Circular Subarray
+```python
+class Solution:
+  def maxSubarraySumCircular(self, A):
+    total, currMin, minSum, currMax, maxSum = 0, 0, A[0], 0, A[0]
+    for a in A:
+      currMax = max(currMax + a, a)
+      maxSum = max(maxSum, currMax)
+      currMin = min(currMin+a, a)
+      minSum = min(minSum, currMin)
+      total += a
+    return max(maxSum, total - minSum) if maxSum > 0 else maxSum
+```
+
+## 1035 Uncrossed Lines
+* dp problem
+Solution 1:
+`t:o(nm), s:o(nm) n: len(A), m: len(B)`
+```python
+class Solution:
+  def maxUncrossedLines(self, A, B):
+    m, n = len(A), len(B)
+    dp = [[0]*(n+1) for _ in range(m+1)]
+    for i in range(1, m+1):
+      for j in range(1, n+1):
+        if A[i-1] == B[j-1]: 
+          dp[i][j] = 1 + dp[i-1][j-1]
+        else:
+          dp[i][j] = max(dp[i-1][j], dp[i][j-1])
+    return dp[-1][-1]
+```
+
+## 329 Longest Increasing Path in a Matrix
+```python
+class Solution:
+  def longestIncreasingPath(self, matrix):
+    if not matrix or not matrix[0]: return 0
+    m, n = len(matrix), len(matrix[0])
+    dp = [[0]*n for _ in range(m)]
+    res = 0
+    for i in range(m):
+      for j in range(n):
+        res = max(res, self.dfs(matrix, i, j, m, n, dp))
+    return res
+
+  def dfs(self, matrix, i, j, m, n, dp):
+    if dp[i][j]: return dp[i][j]
+    dp[i][j] = 1
+    for di, dj in ((-1, 0), (1, 0), (0, -1), (0, 1)):
+      x, y = i + di, j + dj
+      if not 0 <= x < m or not 0 <= y < n or matrix[x][y] <= matrix[i][j]: continue
+      dp[i][j] = max(dp[i][j], 1 + self.dfs(matrix, x, y, m, n, dp))
+    return dp[i][j]
+```
