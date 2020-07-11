@@ -2418,3 +2418,112 @@ class Solution:
       dp[i][j] = max(dp[i][j], 1 + self.dfs(matrix, x, y, m, n, dp))
     return dp[i][j]
 ```
+
+## 54 Spiral Matrix
+* we have l, r, u, d variables to keep track of the current perimeter
+* increment and decrement those as necessary as we move the considered perimeter towards center
+* our while condition is `l <= r and u <= d` because `r = len(matrix[0])-1 and d = len(matrix) - 1`
+`t:o(mn), s:o(1) m:len(matrix), n:len(matrix[0])`
+```python
+class Solution:
+  def spiralOrder(self, matrix):
+    if not matrix or not matrix[0]: return []
+    m, n = len(matrix), len(matrix[0])
+    l, r, u, d = 0, n-1, 0, m-1
+    res = []
+    while l <= r and u <= d:
+      for j in range(l, r+1):
+        if len(res) < m*n: res += matrix[u][j],
+      for i in range(u+1, d):
+        if len(res) < m*n: res += matrix[i][r],
+      for j in range(r, l-1, -1):
+        if len(res) < m*n: res += matrix[d][j], 
+      for i in range(d-1, u, -1):
+        if len(res) < m*n: res += matrix[i][l],
+      l += 1
+      r -= 1
+      u += 1
+      d -= 1
+    return res
+```
+
+### 498 Diagonal Traverse
+`t: o(mn), s: o(1) n: len(matrix), m: len(matrix[0])`
+```python
+class Solution:
+  def findDiagonalOrder(self, matrix):
+    if not matrix or not matrix[0]: return []
+    m, n = len(matrix), len(matrix[0])
+    row, col, d = 0, 0, 1
+    res = []
+    for _ in range(m*n):
+      res += matrix[row][col],
+      row -= d
+      col += d
+
+      if row >= m: row, col, d = m-1, col + 2, -d
+      if col >= n: row, col, d = row + 2, n-1, -d
+      if row < 0: row, d = 0, -d
+      if col < 0: col, d = 0, -d
+    return res
+```
+
+## 935 Knight Dialer
+`t: o(n), s: o(1)`
+```python
+class Solution:
+  def knightDialer(self, N):
+    moves = {1:[6, 8], 2:[7, 9], 3:[4, 8], 4:[0, 3, 9], 5:[], 6:[0, 1, 7], 7:[2, 6], 8:[1, 3], 9:[2, 4], 0:[4, 6]}
+    dp = [1]*10
+    for _ in range(N-1):
+      tmp = [0]*10
+      for i in range(10):
+        for j in moves[i]:
+          tmp[i] += dp[j]
+      dp = tmp
+    return sum(dp)%(10**9 + 7)
+```
+
+## 23 Merge K Sorted Lists
+`t: o(nklogk) s:o(k) n: avg length of lists, k: num sorted lists`
+```python
+from heapq import heapify, heappush, heappop
+class Solution:
+  def mergeKLists(self, lists):
+    heap = [(l.val, i, l) for i, l in enumerate(lists) if l]
+    heapify(heap)
+    count = len(lists)
+    dummy = curr = ListNode()
+    while heap:
+      curr.next = heappop(heap)[2]
+      curr = curr.next
+      if curr.next: 
+        count += 1
+        heappush(heap, (curr.next.val, count, curr.next))
+    return dummy.next
+```
+
+## 33 Search in a Rotated Sorted Array
+* at each point figure out which halfs are sorted and unsorted
+* check if the target fits in the sorted portion, binary search through that if so
+* if it doesn't fit, then repeat the algorithm on unsorted portion
+```python
+class Solution:
+  def search(self, nums, target):
+    if not nums: return -1
+    l, r = 0, len(nums) - 1
+    while l <= r:
+      m = (l+r) // 2
+      if nums[m] == target: return m
+      if nums[m] > nums[r]:
+        if nums[l] <= target <= nums[m]:
+          r = m - 1
+        else:
+          l = m + 1
+      else:
+        if nums[m] <= target <= nums[r]:
+          l = m + 1
+        else:
+          r = m - 1
+    return -1
+```
