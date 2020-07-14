@@ -2527,3 +2527,60 @@ class Solution:
           r = m - 1
     return -1
 ```
+
+## 303 Range Sum Query Mutable
+
+```python
+class NumArray:
+  def __init__(self, nums):
+    self.accu = [0]
+    for n in nums:
+      self.accu += self.accu[-1] + n,
+  
+  def sumRange(self, i, j):
+    return self.accu[j+1]-self.accu[i]
+```
+
+### 435 Non-Overlapping Intervals
+```python
+class Solution:
+  def eraseOverlapIntervals(self, intervals):
+    if not intervals: return 0
+    currEnd = float('-inf')
+    res = 0
+    for start, end in sorted(intervals, key=lambda x: x[1])
+      if currEnd <= start:
+        currEnd = end
+      else:
+        res += 1
+    return res
+```
+
+## 1277 Count Square Submatrices with All Ones
+```python
+class Solution:
+  def countSquares(self, matrix):
+    if not matrix or not matrix[0]: return 0
+    m, n = len(matrix), len(matrix[0])
+    dp = [row[:] for row in matrix]
+    for i in range(1, m):
+      for j in range(1, n):
+        if dp[i][j]:
+          dp[i][j] = 1 + min(dp[i-1][j], dp[i][j-1], dp[i-1][j-1])
+    return sum(sum(row) for row in dp)
+```
+### 567 Permutaiton in String
+* sliding window
+```python
+from collections import Counter
+class Solution:
+  def checkInclusion(self, s1, s2):
+    c1, c2 = Counter(s1), Counter(s2[:len(s1)-1])
+    for i in range(len(s1)-1, len(s2)):
+      c2[s2[i]] += 1
+      if c1 == c2: return True
+      start = i + 1 - len(s1)
+      c2[s2[start]] -= 1
+      if c2[s2[start]] == 0: del c2[s2[start]]
+    return False
+```
