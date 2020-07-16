@@ -2569,7 +2569,7 @@ class Solution:
           dp[i][j] = 1 + min(dp[i-1][j], dp[i][j-1], dp[i-1][j-1])
     return sum(sum(row) for row in dp)
 ```
-### 567 Permutaiton in String
+## 567 Permutaiton in String
 * sliding window
 ```python
 from collections import Counter
@@ -2583,4 +2583,29 @@ class Solution:
       c2[s2[start]] -= 1
       if c2[s2[start]] == 0: del c2[s2[start]]
     return False
+```
+
+## 886 Possible Bipartition
+* dfs
+```python
+class Solution:
+  def possibleBipartition(self, N: int, dislikes: List[List[int]]) -> bool:
+    NOT_COLORED, BLUE, GREEN = 0, 1, -1
+    def helper(personID, color):
+      colorTable[personID] = color
+      for other in dislikeTable[personID]:
+        if colorTable[other] == color:
+          return False
+        if colorTable[other] == NOT_COLORED and not helper(other, -color):
+          return False
+          return True
+    colorTable = [NOT_COLORED]*(N+1)
+    dislikeTable = collections.defaultdict(list)
+    for a, b, in dislikes:
+      dislikeTable[a] += b,
+      dislikeTable[b]
+    for person in range(1, N+1):
+      if colorTable[person] == NOT_COLORED and not helper(person, BLUE):
+        return False
+    return True
 ```
