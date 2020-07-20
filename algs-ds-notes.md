@@ -2609,3 +2609,99 @@ class Solution:
         return False
     return True
 ```
+
+### 297 Serialize and Deserialize Binary Tree
+* preorder traversal
+```python
+class Codec:
+    def serialize(self, root):
+        def doit(node):
+            if node:
+                vals.append(str(node.val))
+                doit(node.left)
+                doit(node.right)
+            else:
+                vals.append('#')
+        vals = []
+        doit(root)
+        return ' '.join(vals)
+
+    def deserialize(self, data):
+        vals = iter(data.split())
+        def doit():
+            val = next(vals)
+            if val == '#':
+                return None
+            node = TreeNode(int(val))
+            node.left = doit()
+            node.right = doit()
+            return node
+        return doit()
+```
+
+## 543 Diameter of Binary Tree
+Solution 1:
+`t: o(v + e), s: o(v+e) v: num vertices, e: num edges`
+```python
+class Solution:
+    def diameterOfBinaryTree(self, root: TreeNode) -> int:
+        self.res = 0
+        def traverse(node):
+          if not node: return 0
+          lh, rh = traverse(node.left), traverse(node.right)
+          self.res = max(self.res, lh + rh)
+          return 1 + max(lh, rh)
+        traverse(root)
+        return self.resa
+```
+
+### 687 Longest Univalue Path
+```python
+class Solution:
+  def longestUnivaluePath(self, root: TreeNode) -> int:
+    self.res = 0
+    def traverse(node):
+      if not node: return 0
+      lh, rh = traverse(node.left), traverse(node.right)
+      l = r = 0
+      if node.left and node.val == node.left.val: l = lh + 1
+      if node.right and node.val == node.right.val: r = rh + 1
+      self.res = max(self.res, l + r)
+      return max(l, r)
+    traverse(root)
+    return self.res
+```
+
+### 889 Construct Binary Tree from Preorder and Postorder Traversal
+```python
+class Solution:
+  def constructFromPrePost(self, pre: List[int], post: List[int]) -> TreeNode:
+    if not pre or not post: return None
+    node = TreeNode(pre[0])
+    if len(pre) == 1: return node
+    i = pre.index(post[-2])
+    node.left = self.constructFromPrePost(pre[1:i], post[:(i-1)])
+    node.right = self.constructFromPrePost(pre[i:], post[(i-1):-1])
+    return node
+
+```
+
+### 787 Cheapest Flights Within K Stops
+```python
+class Solution:
+  def findCheapestPrice(self, n: int, flights: List[List[int]], src: int, dst: int, K: int) -> int:
+    visited = {}
+    graph = collections.defaultdict(list)
+    for s, d, p in flights:
+      graph[s] += (d, p),
+    heap = [(0, 0, src)]
+    while heap:
+      dist, moves, node = heapq.heappop(heap)
+      if node == dst: return dist
+      if node not in visited or moves < visited[node]:
+        visited[node] = moves
+        if moves + 1 <= K+1:
+          for nbr, weight in graph[node]:
+            heapq.heappush(heap, (dist+weight, moves+1, nbr))
+    return -1
+```
