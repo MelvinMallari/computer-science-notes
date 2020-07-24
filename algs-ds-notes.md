@@ -2238,7 +2238,7 @@ class Solution:
 ```
 
 ## 560 Subarray Sums Equals K
-* 
+* keep track of complements
 ```python
 class Solution:
   def subarraySum(self, nums: List[int], k: int) -> int:
@@ -2283,6 +2283,22 @@ class Solution:
     return res[1:]
 ```
 ## 437. Path Sum III
+```python
+class Solution:
+  def pathSum(self, root: TreeNode, sum: int) -> int:
+    if not root: return 0
+    self.res = 0
+    self.dfs(root, {0:1}, 0, sum)
+    return self.res
+    
+  def dfs(self, node, preSum, currSum, target):
+    if not node: return
+    self.res += preSum.get(currSum - target, 0)
+    preSum[currSum] = preSum.get(currSum, 0) + 1
+    self.dfs(node.left, preSum, currSum, target)
+    self.dfs(node.right, preSum, currSum, target)
+    preSum[currSum] -= 1
+```
 
 ## 73 Daily Temperatures
 * stack 
