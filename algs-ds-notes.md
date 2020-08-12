@@ -2757,3 +2757,25 @@ class Solution:
       curr = stack.pop() + curr
     return curr
 ```
+
+## 348 Design Tic-Tac-Toe
+```python
+class TicTacToe:
+    def __init__(self, n: int):
+      self.rows, self.cols = [0]*n, [0]*n
+      self.d1 = self.d2 =  0
+      self.n = n
+
+    def move(self, row: int, col: int, player: int) -> int:
+      mark = 1 if player == 1 else -1
+      self.rows[row] += mark
+      self.cols[col] += mark
+      if row == col: self.d1 += mark
+      if row + col == self.n-1: self.d2 += mark
+      if self.won(row, col): return player
+      return 0
+    
+    def won(self, row, col):
+      n = self.n
+      return abs(self.rows[row]) == n or abs(self.cols[col]) == n or abs(self.d1) == n or abs(self.d2) == n
+```
