@@ -2721,3 +2721,39 @@ class Solution:
             heapq.heappush(heap, (dist+weight, moves+1, nbr))
     return -1
 ```
+
+## 35 Search Insert Position
+* given a sorted array and a target value, return index if target is found
+
+```python
+class Solution:
+  def searchInsert(self, nums, target):
+    if not nums: return -1
+    l, r = 0, len(nums)-1
+    while l <= r:
+      m = (l + r) // 2
+      if nums[m] == target: return m
+      if nums[m] < target:
+        l = m + 1
+      else:
+        r = m - 1
+    return -1
+```
+
+## 1249 Minimum Remove To Make Valid Parentheses
+```python
+class Solution:
+  def minRemoveToMakeValid(self, s: str) -> str:
+    stack, curr = [], ''
+    for c in s:
+      if c == '(':
+        stack.append(curr)
+        curr = ''
+      elif c == ')':
+        if stack: curr = stack.pop() + '(' + curr + ')'
+      else:
+        curr += c
+    while stack:
+      curr = stack.pop() + curr
+    return curr
+```
