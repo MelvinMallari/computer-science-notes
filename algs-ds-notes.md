@@ -8,24 +8,26 @@
 
 ## 309 Best Time to Buy and Sell Stock with Cooldown
 
-This can be solved with dynamic programming. The three different actions (buy, sell, rest) take us between 3 different states: s0, s1, s2.
+This can be solved with dynamic programming. The three different actions (buy,
+sell, rest) take us between 3 different states: s0, s1, s2.
 
-**States**
-s0 (rest -> s0) buy-> s1 (rest-> s1) sell -> s2 rest-> s0
+**States** s0 (rest -> s0) buy-> s1 (rest-> s1) sell -> s2 rest-> s0
 
-s0: can either rest or buy. if rest, stay at s0. if buy go to s1
-s1: can either rest or sell. if rest, stay at s1. if buy go to s2
-s2: just game from s1, so just sold. have to rest, go to s0
+s0: can either rest or buy. if rest, stay at s0. if buy go to s1 s1: can either
+rest or sell. if rest, stay at s1. if buy go to s2 s2: just game from s1, so
+just sold. have to rest, go to s0
 
 **Initial Conditions**
-* `s2[0] = s0[0] = 0` start off at 0  if you haven't bought
-* `s1[0] = 0` start off at -prices[0] if you just bought
+
+- `s2[0] = s0[0] = 0` start off at 0 if you haven't bought
+- `s1[0] = 0` start off at -prices[0] if you just bought
 
 **Edge Cases**
-* if `len(prices) < 2` return 0
 
-Solution 1:
-`T: o(n), S: o(n)`
+- if `len(prices) < 2` return 0
+
+Solution 1: `T: o(n), S: o(n)`
+
 ```python
 class Solution:
 	def maxProfit(self, prices):
@@ -41,9 +43,12 @@ class Solution:
 			s2[i] = s1[i-1] + prices[i]
 		return max(s0[-1], s2[-1])
 ```
-Solution 2:
-`T: o(n), S: o(1)`
-* Notice that that all the states only depend on their previous value. We can reduce our memory consumption by using variables instead.
+
+Solution 2: `T: o(n), S: o(1)`
+
+- Notice that that all the states only depend on their previous value. We can
+  reduce our memory consumption by using variables instead.
+
 ```python
 class Solution:
 	def maxProfit(self, prices):
@@ -55,12 +60,15 @@ class Solution:
 ```
 
 ## 128 Longest Consecutive Sequence
-* The key idea is to use a set to reference each number in O(1).
-* Check that the number before the current number is not in the set. This is the start of the streak.
-* Keep walking the streak while we keep finding the consecutive number in the set
 
-Solution:
-`T: o(n), S: o(n)`
+- The key idea is to use a set to reference each number in O(1).
+- Check that the number before the current number is not in the set. This is the
+  start of the streak.
+- Keep walking the streak while we keep finding the consecutive number in the
+  set
+
+Solution: `T: o(n), S: o(n)`
+
 ```python
 class Solution:
 	def longestConsecutive(self, nums):
@@ -77,17 +85,22 @@ class Solution:
 ```
 
 ## 45 Jump Game II
-* Greedy Algorithm
-* At each number, evaluate the farthest jump that you could have taken
-* If you exhaust your current jump, increase the number of jumps you need to take, set your current jump to the farthest jump you could have taken
-* This minimizes the amount of jumps you need to take while maximizing the jump distance
+
+- Greedy Algorithm
+- At each number, evaluate the farthest jump that you could have taken
+- If you exhaust your current jump, increase the number of jumps you need to
+  take, set your current jump to the farthest jump you could have taken
+- This minimizes the amount of jumps you need to take while maximizing the jump
+  distance
 
 **Edge Case**
-* (1) If `len(nums) < 2` then no jumps need to be taken, return 0
-* (2) We only consider the nums prior to the last number. Must consider the case where you reach the last number at the end of a jump.
 
-Solution:
-`T: o(n), S: o(1)`
+- (1) If `len(nums) < 2` then no jumps need to be taken, return 0
+- (2) We only consider the nums prior to the last number. Must consider the case
+  where you reach the last number at the end of a jump.
+
+Solution: `T: o(n), S: o(1)`
+
 ```python
 class Solution:
 	def jump(self, nums):
@@ -103,19 +116,23 @@ class Solution:
 ```
 
 ## 32 Longest Valid Parentheses
-* Use a stack
-* Loop through string, if the parenthese is an opener, append index to the stack
-* if closer, pop from the stack
-	* If the last one was an opener, then we just matched a valid pair
-	* If the stack is empty, append the invalid closer so we can reference it as a left boundary
-	* If the stack is not empty, then we update the max valid we've seen so far
-		* Key idea is any difference b/w curr index and last invalid index stored in stack represents a valid parentheses chunk. Record the longest chunk seen.
+
+- Use a stack
+- Loop through string, if the parenthese is an opener, append index to the stack
+- if closer, pop from the stack _ If the last one was an opener, then we just
+  matched a valid pair _ If the stack is empty, append the invalid closer so we
+  can reference it as a left boundary _ If the stack is not empty, then we
+  update the max valid we've seen so far _ Key idea is any difference b/w curr
+  index and last invalid index stored in stack represents a valid parentheses
+  chunk. Record the longest chunk seen.
 
 **Edge Case**
-* (1) Consider the case where the whole parentheses is valid. Must instantiate the stack with -1 to account for the length of whole string
 
-Solution:
-`T: o(n), S: o(n)`
+- (1) Consider the case where the whole parentheses is valid. Must instantiate
+  the stack with -1 to account for the length of whole string
+
+Solution: `T: o(n), S: o(n)`
+
 ```python
 class Solution:
 	def longestValidParentheses(self, s):
@@ -134,15 +151,16 @@ class Solution:
 ```
 
 ## 279 Perfect Squares
-* Key pattern is dynamic programming
-* Create a dp table across possible squares and values up to n
-* Base case is 0
-* `T: o(nm), S: o(nm)` solution exist, but was getting TLE so just optimal solution show
 
-Solution:
-`T: o(nm), S: o(n)`
-`n: input n`
+- Key pattern is dynamic programming
+- Create a dp table across possible squares and values up to n
+- Base case is 0
+- `T: o(nm), S: o(nm)` solution exist, but was getting TLE so just optimal
+  solution show
+
+Solution: `T: o(nm), S: o(n)` `n: input n`
 `m: num perfect squares that fit in n`
+
 ```python
 class Solution:
 	def numSquares(self, n):
@@ -157,12 +175,14 @@ class Solution:
 ```
 
 ## 198 Houser Robber
-* Key is to use dynamic programming:
-* Base Case is 0
-* Memory optimization available when you realize current value only dependent on the previous value
 
-Solution 1:
-`T: o(n), S: o(n)`
+- Key is to use dynamic programming:
+- Base Case is 0
+- Memory optimization available when you realize current value only dependent on
+  the previous value
+
+Solution 1: `T: o(n), S: o(n)`
+
 ```python
 class Solution:
 	def rob(self, nums):
@@ -174,8 +194,8 @@ class Solution:
 		return dp[-1]
 ```
 
-Solution 2:
-`T: o(n), S: o(1)`
+Solution 2: `T: o(n), S: o(1)`
+
 ```python
 class Solution:
 	def rob(self, nums):
@@ -186,9 +206,10 @@ class Solution:
 ```
 
 ## 102 Binary Tree Level Order Traversal
-* Key idea is to go through level by level building a new queue out of the previous queue
-Solution:
-`T: o(n), S: o(n)`
+
+- Key idea is to go through level by level building a new queue out of the
+  previous queue Solution: `T: o(n), S: o(n)`
+
 ```python
 class Solution:
 	def levelOrder(self, root):
@@ -203,17 +224,28 @@ class Solution:
 			q = leaves
 		return res
 ```
-## 337 House Robber III
-* This is a great problem. Let's walk through the solutions from naive -> optimal
-* In the naive solution, we understand that if we choose to rob the root, then we must skip the kid nodes `root.left`, `root.right`, and rob the grandchildren nodes `root.left.left`, `root.left.right`, `root.right.left` and `root.right.right`. We consider both and choose the highest value operation.
-* In the more optimal solution, we realize that in the naive solution there are overlaps in the operations we consider.
-	* e.g. robHelper(root) considers robHelper(root.left.left), but when we call robHelper(root.left.left), it calls robHelper(root.left.left) again! We can use dynamic programming to remember the results of shared operatins
-* In the most optimal solution as we backtrack back up through the tree in our recursive calls, we return the the value of the options to either rob the root or not.
-	* return `res[0]` returns the maximum we can rob if we DON'T rob the root (skipRoot)
-	* return `res[1]` returns the maximum we can rob if we rob the root (robRoot)
 
-Solution 0 (Naive):
-`T: o(n!), S: o(n)`
+## 337 House Robber III
+
+- This is a great problem. Let's walk through the solutions from naive ->
+  optimal
+- In the naive solution, we understand that if we choose to rob the root, then
+  we must skip the kid nodes `root.left`, `root.right`, and rob the
+  grandchildren nodes `root.left.left`, `root.left.right`, `root.right.left` and
+  `root.right.right`. We consider both and choose the highest value operation.
+- In the more optimal solution, we realize that in the naive solution there are
+  overlaps in the operations we consider. \* e.g. robHelper(root) considers
+  robHelper(root.left.left), but when we call robHelper(root.left.left), it
+  calls robHelper(root.left.left) again! We can use dynamic programming to
+  remember the results of shared operatins
+- In the most optimal solution as we backtrack back up through the tree in our
+  recursive calls, we return the the value of the options to either rob the root
+  or not. _ return `res[0]` returns the maximum we can rob if we DON'T rob the
+  root (skipRoot) _ return `res[1]` returns the maximum we can rob if we rob the
+  root (robRoot)
+
+Solution 0 (Naive): `T: o(n!), S: o(n)`
+
 ```python
 class Solution:
 	def rob(self, root):
@@ -227,8 +259,8 @@ class Solution:
 		return max(root.val + val, self.rob(root.left) + self.rob(root.right))
 ```
 
-Solution 1 (More Optimal):
-`T: o(n), S: o(n)`
+Solution 1 (More Optimal): `T: o(n), S: o(n)`
+
 ```python
 class Solution:
 	def rob(self, root):
@@ -249,6 +281,7 @@ class Solution:
 
 Solution 2 (Most Optimal):
 `T: o(n), S: o(1) (if you don't consider recursive stack calls)`
+
 ```python
 class Solution:
 	def rob(self, root):
@@ -264,15 +297,19 @@ class Solution:
 ```
 
 ## 581 Shortest Unsorted Continuous Subarray
-* Key idea is that you loop through the array searching for the lefmost and rightmost numbers that break the sorted invariant
-* Sorted Invariant: any number should be >= than the largest number to its left. any number should be =< than the smallest number to its right.
+
+- Key idea is that you loop through the array searching for the lefmost and
+  rightmost numbers that break the sorted invariant
+- Sorted Invariant: any number should be >= than the largest number to its left.
+  any number should be =< than the smallest number to its right.
 
 **Edge Case**
-* in the case that the array is sorted, then the initial values of `end`, `start` must bound a difference of 0.
-	* Therefore `start, end = -1, -2`
 
-Solution 1 (more readable):
-`T: o(n), S: o(1)`
+- in the case that the array is sorted, then the initial values of `end`,
+  `start` must bound a difference of 0. \* Therefore `start, end = -1, -2`
+
+Solution 1 (more readable): `T: o(n), S: o(1)`
+
 ```python
 class Solution:
 	def findUnsortedSubarray(self, nums):
@@ -287,8 +324,8 @@ class Solution:
 		return end - start + 1
 ```
 
-Solution 2 (optimal):
-`T: o(n), S: o(1)`
+Solution 2 (optimal): `T: o(n), S: o(1)`
+
 ```python
 class Solution:
 	def findUnsortedSubarray(self, nums):
@@ -304,15 +341,17 @@ class Solution:
 ```
 
 ## 494 Target Sum
-* Use dynamic programming
-* Key is to loop through numbers and sum the different ways we can make up the number if taken as a positive, or negative
-	* if we take num x as negative: `step[y-x] += count[y]`
-	* if we take num x as positive: `step[y+x] += count[y]`
 
-**Base Case**
-the base case is, with no numbers, we can make 0 one way (1)
+- Use dynamic programming
+- Key is to loop through numbers and sum the different ways we can make up the
+  number if taken as a positive, or negative _ if we take num x as negative:
+  `step[y-x] += count[y]` _ if we take num x as positive:
+  `step[y+x] += count[y]`
+
+**Base Case** the base case is, with no numbers, we can make 0 one way (1)
 
 `T: o(n^2), S: o(n^2), n:len(nums)`
+
 ```python
 class Solution:
 	def findTargetSumWays(self, nums, S):
@@ -328,14 +367,17 @@ class Solution:
 ```
 
 ## 142 Linked List Cycle II
-* use two pointers, a fast and a slow pointer
-* faster pointer skips two nodes, slow pointer skips one.
-* fast pointer either hits the end of the list, in which case there is no cycle, or fast == slow
-* if fast == slow, we've hit the halfway point of the cycle
-* restart the fast pointer to the start of the list, and have the two pointers move at the same pace to find the intersection
 
-Solution
-`T: o(n), S: o(1)`
+- use two pointers, a fast and a slow pointer
+- faster pointer skips two nodes, slow pointer skips one.
+- fast pointer either hits the end of the list, in which case there is no cycle,
+  or fast == slow
+- if fast == slow, we've hit the halfway point of the cycle
+- restart the fast pointer to the start of the list, and have the two pointers
+  move at the same pace to find the intersection
+
+Solution `T: o(n), S: o(1)`
+
 ```python
 class Solution:
 	def detectCycle(self, head):
@@ -351,12 +393,15 @@ class Solution:
 ```
 
 ## 72 Edit Distance
-* dynamic programming
-* key idea is that delete, insert and replace represent three different recurisve operations that we can check
-	* We can cache or tabularize the returns of these three different recursive calls
 
-Solution 1 (Naive, top-down solution):
-Time complexity is hard to analyze, but exponential
+- dynamic programming
+- key idea is that delete, insert and replace represent three different
+  recurisve operations that we can check \* We can cache or tabularize the
+  returns of these three different recursive calls
+
+Solution 1 (Naive, top-down solution): Time complexity is hard to analyze, but
+exponential
+
 ```python
 class Solution:
 	def minDistance(self, word1, word2):
@@ -372,6 +417,7 @@ class Solution:
 
 Solution 2 (Optimal, top-down solution):
 `T: o(mn), S: o(mn), m: len(w1), n: len(w2)`
+
 ```python
 class Solution:
 	def minDistance(self, word1, word2, i=0, j=0, memo={}):
@@ -390,17 +436,18 @@ class Solution:
 		return memo[(i, j)]
 ```
 
-Solution 3 (Optimal, bottom-up solution):
-**Base Case**
-* Base case is if word to transform to is empty, then it would take length of word to edit into empty string
+Solution 3 (Optimal, bottom-up solution): **Base Case**
 
-* from the perpective for word1 (which needs to be transformed to word2)
-	* insert: represented by `1 + dp[i-1][j]`
-	* delete: represented by `1 + dp[i][j-1]`
-	* replace: represented by `1 + dp[i-1][j-1]`
-	* match: represented by `dp[i-1][j-1]`
+- Base case is if word to transform to is empty, then it would take length of
+  word to edit into empty string
+
+- from the perpective for word1 (which needs to be transformed to word2) _
+  insert: represented by `1 + dp[i-1][j]` _ delete: represented by
+  `1 + dp[i][j-1]` _ replace: represented by `1 + dp[i-1][j-1]` _ match:
+  represented by `dp[i-1][j-1]`
 
 `T: o(mn), S: o(mn), m: len(w1), n: len(w2)`
+
 ```python
 class Solution:
 	def minDistance(self, word1, word2):
@@ -420,16 +467,20 @@ class Solution:
 ```
 
 ## 338 Counting Bits
-* dynamic programming
-* Key thing to realize is that you want to fit the largest squares of 2's you can, cache the result for future reference
-* we take offset and continually check if it'll finally fit into the current number we're at
-* otherwise i can be made by the num of 1's it takes from the i-offset + 1
+
+- dynamic programming
+- Key thing to realize is that you want to fit the largest squares of 2's you
+  can, cache the result for future reference
+- we take offset and continually check if it'll finally fit into the current
+  number we're at
+- otherwise i can be made by the num of 1's it takes from the i-offset + 1
 
 **Base Case**
-* n = 0 requires 0 1's to represent
 
-Solution:
-`T: o(n), S: o(1), n: num`
+- n = 0 requires 0 1's to represent
+
+Solution: `T: o(n), S: o(1), n: num`
+
 ```python
 class Solution:
 	def countBits(self, num):
@@ -441,12 +492,13 @@ class Solution:
 ```
 
 ## 14 Longest Common Prefix
-* first, find the shortest word
-* then compare each to every ch in the shortest word
-* if there is a mismatch, return the matches up til the mismatches
-* if not mismatches return the whole word
-Solution:
-`T: o(mn), S: o(m) m: length of shortest word, n: `
+
+- first, find the shortest word
+- then compare each to every ch in the shortest word
+- if there is a mismatch, return the matches up til the mismatches
+- if not mismatches return the whole word Solution:
+  `T: o(mn), S: o(m) m: length of shortest word, n:`
+
 ```python
 class Solution:
 	def longestCommonPrefix(self, strs):
@@ -460,12 +512,13 @@ class Solution:
 ```
 
 ## 26 Remove Duplicates from Array
-* Key algorithm is often involved with skipping duplicates in an array
-	* `if i < len(nums) - 1 and nums[i] == nums[i+1]: continue`
-	* `if i > 0 and nums[i] == nums[i-1]: continue`
 
-Solution:
-`T: o(n), s: o(1), n: len(nums)`
+- Key algorithm is often involved with skipping duplicates in an array _
+  `if i < len(nums) - 1 and nums[i] == nums[i+1]: continue` _
+  `if i > 0 and nums[i] == nums[i-1]: continue`
+
+Solution: `T: o(n), s: o(1), n: len(nums)`
+
 ```python
 class Solution:
 	def removeDuplicates(self, nums):
@@ -478,11 +531,11 @@ class Solution:
 ```
 
 ## 88 Merge Sorted Array
-* Variation of merge sort merging algorithm
 
+- Variation of merge sort merging algorithm
 
-Solution:
-`T: o(n), s: o(1), n: len(nums)`
+Solution: `T: o(n), s: o(1), n: len(nums)`
+
 ```python
 class Solution:
 	def merge(self, nums1, m, nums2,n):
@@ -508,15 +561,17 @@ class Solution:
 ```
 
 ## 7 Reverse Integer
-* Key idea is to modulo the number by 10 to get the 1's number
-* add the modulo to the result
-* multiply the result by 10 to shift the number's up to make place for the one's digit
-* only shift the numbers up if there's more to modulo
-* account for negative numbers by having a `sign` variable that's negative if the initial num negative
 
+- Key idea is to modulo the number by 10 to get the 1's number
+- add the modulo to the result
+- multiply the result by 10 to shift the number's up to make place for the one's
+  digit
+- only shift the numbers up if there's more to modulo
+- account for negative numbers by having a `sign` variable that's negative if
+  the initial num negative
 
-Solution
-`T: o(n), S: o(1), n: num digits in number`
+Solution `T: o(n), S: o(1), n: num digits in number`
+
 ```python
 class Solution:
 	def reverse(self, x):
@@ -530,13 +585,13 @@ class Solution:
 ```
 
 ## 36 Valid Sudoku
-* Need to check that all rows and all cols and all 3x3 squares are valid
-* we'll define "unit" as a row or col or square.
-* a unit is valid when ther are no repeats in each unit
 
+- Need to check that all rows and all cols and all 3x3 squares are valid
+- we'll define "unit" as a row or col or square.
+- a unit is valid when ther are no repeats in each unit
 
-Solution:
-`T:o(n) S:o(1), n: num elements in sudoku`
+Solution: `T:o(n) S:o(1), n: num elements in sudoku`
+
 ```python
 class Solution:
 	def isValidSudoku(self, board):
@@ -565,17 +620,15 @@ class Solution:
 ```
 
 ## 44 Wildcard Matching
-* dynamic programming
-* Two key ideas for the state equation:
-	* if `dp[i][j] == '.' or p[j-1] == s[i-1]` both represent a match
-		* in this case `dp[i][j] = dp[i-1][j-1]`
-	* if `p[j-1] == '*'` there are two possible cases that could be true
-		* the word up til the wildcard operator was already a match. '*' doesn't not include the current character
-			* this cases is represented by `dp[i][j-1]`
-		* the current letter is represented by a previously called wild card operator. '*' does include the current character
-			* this case is represented by `dp[i-1][j]`
+
+- dynamic programming
+- Two key ideas for the state equation: _ if
+  `dp[i][j] == '.' or p[j-1] == s[i-1]` both represent a match _ in this case
+  `dp[i][j] = dp[i-1][j-1]` _ if `p[j-1] ==
+  '_'`there are two possible cases that could be true * the word up til the wildcard operator was already a match. '*' doesn't not include the current character * this cases is represented by`dp[i][j-1]`* the current letter is represented by a previously called wild card operator. '*' does include the current character * this case is represented by`dp[i-1][j]`
 
 `T: o(mn), S:o(mn). m: len(p) n:len(s)`
+
 ```python
 class Solution:
 	def isMatch(self, s, p):
@@ -593,21 +646,21 @@ class Solution:
 ```
 
 ## 312 Burst Balloons
-* dynamic programming
-* we want to loop through all possible gap sizes from (2 -> n)
-	* reason we pick 2 as a starting point is that's the min size of a non-inclusive borders
-	* e.g. 0, 1, 2 -> (0, 2 bound 1)
-* as we loop through the gap sizes we cache the optimal solution for that particular gap and slice of array
-* state equation:
-	```python
-		dp[l][r] = max(dp[l][r], dp[l][i] + nums[l]*nums[i]*nums[r] + dp[i][r])
-	```
-	* we do `nums[l]*nums[i]*nums[r]` because we've cached the optimal solution from l -> i and i -> r
-	* in this case we've popped the balloons in the middle and now want to cache the result from l -> r
 
+- dynamic programming
+- we want to loop through all possible gap sizes from (2 -> n) _ reason we pick
+  2 as a starting point is that's the min size of a non-inclusive borders _ e.g.
+  0, 1, 2 -> (0, 2 bound 1)
+- as we loop through the gap sizes we cache the optimal solution for that
+  particular gap and slice of array
+- state equation:
+  `python dp[l][r] = max(dp[l][r], dp[l][i] + nums[l]*nums[i]*nums[r] + dp[i][r])`
+  - we do `nums[l]*nums[i]_nums[r]` because we've cached the optimal solution
+    from l -> i and i -> r \_ in this case we've popped the balloons in the
+    middle and now want to cache the result from l -> r
 
-Solution 1 (Top Down):
-`T: o(n^3), S: o(n^3)`
+Solution 1 (Top Down): `T: o(n^3), S: o(n^3)`
+
 ```python
 class Solution:
 	def maxCoins(self, nums):
@@ -621,6 +674,7 @@ class Solution:
 ```
 
 Solution 2 (Bottom Up):
+
 ```python
 class Solution:
 	def maxCoins(self, nums):
@@ -633,15 +687,18 @@ class Solution:
 					dp[l][r] = max(dp[l][r], dp[l][i] + nums[l]*nums[i]*nums[r] + dp[i][r])
 		return dp[0][n-1]
 ```
+
 ## 28 Implement strStr()
-* loop through and check for substrs to see if they match the needle
+
+- loop through and check for substrs to see if they match the needle
 
 **edge case**
-* if the needle matches the last n letters in the haystack, this must be accounted for in the loop
-	* off by 1 error
 
-Solution:
-`T:o(n) S:o(1)`
+- if the needle matches the last n letters in the haystack, this must be
+  accounted for in the loop \* off by 1 error
+
+Solution: `T:o(n) S:o(1)`
+
 ```python
 class Solution:
 	def strStr(self, haystack, needle):
@@ -653,9 +710,10 @@ class Solution:
 ```
 
 ## 13 Roman to Integer
-* Idea is to loop through the array backwards, if we run into a value that's less than previous we subtract rather than add
-Solution:
-`T:o(n) S:o(1)`
+
+- Idea is to loop through the array backwards, if we run into a value that's
+  less than previous we subtract rather than add Solution: `T:o(n) S:o(1)`
+
 ```python
 class Solution:
 	def romanToInt(self, s):
@@ -673,24 +731,27 @@ class Solution:
 ```
 
 ## 91 Decode Ways
-* dynamic programming
-* state equations:
-	* `if 0 < int(s[i-1:i]): dp[i] += dp[i-1]` represents a match of number within [1, 9]
-	* `if 10 <= int(s[i-2:i]) <= 26: tmpCurr += prev` represents a match of number within [10, 26]
 
-	* `prev = curr = 1`
-	* `tmpCurr = 0`
-	* `if 0 < int(s[i-1:i]): tmpCurr += curr` represents a match of number within [1, 9]
-	* `if 10 <= int(s[i-2:i]) <= 26: tmpCurr += prev` represents a match of number within [10, 26]
+- dynamic programming
+- state equations: _ `if 0 < int(s[i-1:i]): dp[i] += dp[i-1]` represents a match
+  of number within [1, 9] _ `if 10 <= int(s[i-2:i]) <= 26: tmpCurr += prev`
+  represents a match of number within [10, 26]
+
+      	* `prev = curr = 1`
+      	* `tmpCurr = 0`
+      	* `if 0 < int(s[i-1:i]): tmpCurr += curr` represents a match of number within [1, 9]
+      	* `if 10 <= int(s[i-2:i]) <= 26: tmpCurr += prev` represents a match of number within [10, 26]
 
 **Base Case**
-* `dp[0] = 1` case where there is a single match gives one possibility
+
+- `dp[0] = 1` case where there is a single match gives one possibility
 
 **Edge Case**
-* when `s == '' or s[0] == 0`  then there are no possible matches
 
-Solution 1 (non-optimal space):
-`T: o(n) S: o(n) n: len(nums)`
+- when `s == '' or s[0] == 0` then there are no possible matches
+
+Solution 1 (non-optimal space): `T: o(n) S: o(n) n: len(nums)`
+
 ```python
 class Solution:
 	def numDecodings(self, s):
@@ -703,8 +764,8 @@ class Solution:
 		return dp[-1]
 ```
 
-Solution 2 (optimal space/time):
-`T: o(n) S: o(1) n: len(nums)`
+Solution 2 (optimal space/time): `T: o(n) S: o(1) n: len(nums)`
+
 ```python
 class Solution:
 	def numDecodings(self, s):
@@ -719,10 +780,11 @@ class Solution:
 ```
 
 ## 122 Best time to buy and sell stock ii
-* peak and valley algorithm
 
-class Solutiion:
-`T: o(n), s: o(1) n = len(prices)`
+- peak and valley algorithm
+
+class Solutiion: `T: o(n), s: o(1) n = len(prices)`
+
 ```python
 class Solution:
 	def maxProfit(self, prices):
@@ -733,10 +795,11 @@ class Solution:
 ```
 
 ## 38 Count and Say
-* Loop through n-1 and count it up
 
-class Solution:
-`T: o(n^2?), s: o(1) hard to reason`
+- Loop through n-1 and count it up
+
+class Solution: `T: o(n^2?), s: o(1) hard to reason`
+
 ```python
 class Solution:
 	def countAndSay(self, n):
@@ -756,10 +819,12 @@ class Solution:
 ```
 
 ## 66 Plus One
-* Loop through the array backwards, turn the 9's into zeros. If we reach the end of the array, append a 1 to the beginning
 
-Solution:
-`T: o(n), s: o(1) n: len(digits)`
+- Loop through the array backwards, turn the 9's into zeros. If we reach the end
+  of the array, append a 1 to the beginning
+
+Solution: `T: o(n), s: o(1) n: len(digits)`
+
 ```python
 class Solution:
 	def plusOne(self, digits):
@@ -772,7 +837,9 @@ class Solution:
 ```
 
 ## 144 Binary Tree Preorder Traversal
+
 `T: o(n), s: o(n) n: num nodes`
+
 ```python
 class Solution:
 	def preorderTraversal(self, root):
@@ -787,8 +854,9 @@ class Solution:
 ```
 
 ## 103 Binary Tree Zig Zag Level Order Traversal
-Solution I came up with:
-`T: o(n), s: o(n) n: num nodes`
+
+Solution I came up with: `T: o(n), s: o(n) n: num nodes`
+
 ```python
 class Solution:
 	def zigzagLevelOrder(self, root):
@@ -807,7 +875,9 @@ class Solution:
 			counter += 1
 		return res
 ```
+
 Fancy Solution I did not come up with:
+
 ```python
 class Solution:
 	def zigzagLevelOrder(self, root):
@@ -822,10 +892,12 @@ class Solution:
 ```
 
 ## 116 Populating Next Right Pointers in Each Node
-* We want to traverse through starting through the left most nodes and make our way to the right
 
-Solution:
-`T:o(n), s:o(1). n: num nodes in tree`
+- We want to traverse through starting through the left most nodes and make our
+  way to the right
+
+Solution: `T:o(n), s:o(1). n: num nodes in tree`
+
 ```python
 class Solution:
 	def connect(self, root):
@@ -841,11 +913,12 @@ class Solution:
 ```
 
 ## 680 Valid Palindrome II
-* Use two pointers moving towards each other. If we find a mismatch, delete either and check if you can make a palindrome.
-* You can just letters between left and right pointer, because you've confirmed matches outside of them
-Solution:
-`T:o(n), s:o(1). n: num nodes in tree`
-``
+
+- Use two pointers moving towards each other. If we find a mismatch, delete
+  either and check if you can make a palindrome.
+- You can just letters between left and right pointer, because you've confirmed
+  matches outside of them Solution: `T:o(n), s:o(1). n: num nodes in tree` ``
+
 ```python
 class Solution:
 	def validPalindrome(self, s):
@@ -858,20 +931,21 @@ class Solution:
 			r -= 1
 		return True
 ```
-## 10 Regular Expression Matching
-* if `p[j-1] (current char in string p) != '*'`
-	* if `s[i-1] == p[j-1] or p[j-1] == '.'` if match, or match operator
-		* `dp[i][j] = dp[i-1][j-1]`
-* else
-	* if `ch == '*'`
-		* wildcard operator can either propogate horizontally or vertically
-			* horizontal propogation: `dp[i][j] = dp[i][j-2]`
-			* vertical propogation: `dp[i][j] |= dp[i-1][j]`
-				* only check vertical propogation if there's a char match or match operator prior to wildcard operator
-				* |= because the horizontal propogation might have returned true.
 
-Solution:
-`T:o(mn), s:o(mn). m: len(s) n: len(p)`
+## 10 Regular Expression Matching
+
+- if `p[j-1] (current char in string p) != '*'` _ if
+  `s[i-1] == p[j-1] or p[j-1] == '.'` if match, or match operator _
+  `dp[i][j] = dp[i-1][j-1]`
+- else _ if `ch ==
+  '_'`* wildcard operator can either propogate horizontally or vertically * horizontal propogation:`dp[i][j]
+  = dp[i][j-2]`* vertical propogation:`dp[i][j] |= dp[i-1][j]` _ only check
+  vertical propogation if there's a char match or match operator prior to
+  wildcard operator _ |= because the horizontal propogation might have returned
+  true.
+
+Solution: `T:o(mn), s:o(mn). m: len(s) n: len(p)`
+
 ```python
 class Solution:
 	def isMatch(self, s, p):
@@ -891,8 +965,9 @@ for j in range(2, len(p)+1):
 ```
 
 ## 118 Pascal's Triangle
-Solution:
-`T:o(n^2), s:o(1) n: numRows`
+
+Solution: `T:o(n^2), s:o(1) n: numRows`
+
 ```python
 class Solution:
 		def generate(self, numRows: int) -> List[List[int]]:
@@ -904,12 +979,14 @@ class Solution:
 ```
 
 ## 127 Word Ladder
-* key idea is to explore minimum conversion distance with a BFS
-* key idea is that you can compare the words with other words in the word list by using a map of lists
 
-Solution
-`T:o(n^2), s:o(1) n: numRows`
-```python
+- key idea is to explore minimum conversion distance with a BFS
+- key idea is that you can compare the words with other words in the word list
+  by using a map of lists
+
+Solution `T:o(n^2), s:o(1) n: numRows`
+
+````python
 def constructWD(wordList):
 		d = collections.defaultdict(list)
 		for w in wordList:
@@ -947,13 +1024,14 @@ class Solution(object):
 
 				d = constructWD(set(wordList))
 				return bfs(beginWord, endWord, d)
-```
+````
 
 ## 171 Excel Sheet Column Number
-* Each number is a power of 26, kind like a hex number
 
-Solution:
-`T:o(n), S:o(1) n: len(s)`
+- Each number is a power of 26, kind like a hex number
+
+Solution: `T:o(n), S:o(1) n: len(s)`
+
 ```python
 class Solution:
 	def titleToNumber(self, s):
@@ -964,12 +1042,13 @@ class Solution:
 ```
 
 ## 130 Surrounded Regions
-* dfs all the `O`'s around the edges convert that to some character, call it `#`
-* dfs from the inside and the `O`'s from the inside convert to `X`
-* convert all the `#`'s to `O`
 
-Solution:
-`T:o(mn) S:o(1) m: len(board), n: len(board[0])`
+- dfs all the `O`'s around the edges convert that to some character, call it `#`
+- dfs from the inside and the `O`'s from the inside convert to `X`
+- convert all the `#`'s to `O`
+
+Solution: `T:o(mn) S:o(1) m: len(board), n: len(board[0])`
+
 ```python
 class Solution:
 	def solve(self, board):
@@ -1001,15 +1080,17 @@ class Solution:
 		self.dfs(board, i, j-1, mark)
 		self.dfs(board, i, j+1, mark)
 ```
-## 131 Palindrome Partitioning
-* dfs + backtracking
-* How to recognize backtracking?
-	* a string can be partitioned in a different _combination_ of ways
-	* string partitions do _not_ have to be the same length.
-		* if any part of the string is valid palindrome, then explore the rest of the string to confirm that it is a palindrome
 
-Solution:
-`T:o(n!), S: o(n!) n: len(s)`
+## 131 Palindrome Partitioning
+
+- dfs + backtracking
+- How to recognize backtracking? _ a string can be partitioned in a different
+  *combination* of ways _ string partitions do _not_ have to be the same
+  length. \* if any part of the string is valid palindrome, then explore the
+  rest of the string to confirm that it is a palindrome
+
+Solution: `T:o(n!), S: o(n!) n: len(s)`
+
 ```python
 class Solution:
 	def partition(self, s):
@@ -1031,13 +1112,16 @@ class Solution:
 ```
 
 ## 134 Gas Station
-* Two key ideas:
-	* if a car starts at A and cannot reach point B. Any station between A and B cannot reach B. `(1)`
-		* Similar to the idea in Kadane's algorithm. Idea is that you start a station with >= 0 gas, otherwise you wouldn't have been able to reach it
-	* if total gas available > total cost, then there exists a solution: This one makes intuitive sense, with enough gas you can reach any station. `(2)`
 
-Solution:
-`T:o(n), S:o(1) n: len(gas)`
+- Two key ideas: _ if a car starts at A and cannot reach point B. Any station
+  between A and B cannot reach B. `(1)` _ Similar to the idea in Kadane's
+  algorithm. Idea is that you start a station with >= 0 gas, otherwise you
+  wouldn't have been able to reach it \* if total gas available > total cost,
+  then there exists a solution: This one makes intuitive sense, with enough gas
+  you can reach any station. `(2)`
+
+Solution: `T:o(n), S:o(1) n: len(gas)`
+
 ```python
 class Solution:
 	def canCompleteCircuit(self, gas, cost):
@@ -1053,11 +1137,14 @@ class Solution:
 ```
 
 ## 162 Peak Element
-* Realize that a peak element is just the largest number in the sorted portion of an array
-* therefore we can use binary search, because we are guaranteed a peak number and therefore a sorted portion
 
-Solution:
-`T: o(logn) S: o(1). n: len(nums)`
+- Realize that a peak element is just the largest number in the sorted portion
+  of an array
+- therefore we can use binary search, because we are guaranteed a peak number
+  and therefore a sorted portion
+
+Solution: `T: o(logn) S: o(1). n: len(nums)`
+
 ```python
 class Solution:
 	def findPeakElement(self, nums):
@@ -1072,12 +1159,14 @@ class Solution:
 ```
 
 ## 189 Rotate Array
-* have to mod k with the len(nums) in case k > len(nums)
-* learned that nums[:] modifies original array
-* way to do this in o(1) space to reverse the entire array, then reverse the two portions
 
-Solution 1:
-`T: o(n), s: o(n), n: len(nums)`
+- have to mod k with the len(nums) in case k > len(nums)
+- learned that nums[:] modifies original array
+- way to do this in o(1) space to reverse the entire array, then reverse the two
+  portions
+
+Solution 1: `T: o(n), s: o(n), n: len(nums)`
+
 ```python
 class Solution:
 	def rotate(self, nums, k):
@@ -1085,8 +1174,8 @@ class Solution:
 		nums[:] = nums[-k:] + nums[:-k]
 ```
 
-Solution 2:
-`T: o(n), s: o(1), n: len(nums)`
+Solution 2: `T: o(n), s: o(1), n: len(nums)`
+
 ```python
 class Solution:
 	def rotate(self, nums, k):
@@ -1103,10 +1192,12 @@ class Solution:
 ```
 
 ## 210 Course Schedule II
-* topological sort
+
+- topological sort
 
 Solution 1 (recursive dfs):
 `T: o(v + e), s: o(n), n: numCourses, v: num vertices, e: num edges`
+
 ```python
 class Solution:
 	def findOrder(self, numCourses, prereqs):
@@ -1132,6 +1223,7 @@ class Solution:
 
 Solution 2 (iterative dfs):
 `T: o(v + e), s: o(n), n: numCourses, v: num vertices, e: num edges`
+
 ```python
 class Solution:
 	def findOrder(self, numCourses, prereqs):
@@ -1153,6 +1245,7 @@ class Solution:
 
 Solution 2 (bfs):
 `T: o(v + e), s: o(n), n: numCourses, v: num vertices, e: num edges`
+
 ```python
 class Solution:
 	def findOrder(self, numCourses, prereqs):
@@ -1172,19 +1265,25 @@ class Solution:
 			del graph[course]
 		return res if len(res) == numCourses else []
 ```
+
 ## 140 Word Break II
-* dynamic programming
-* recursively explore rest of the word after word match, if letters left in s to explore
-* if match, then append the word with a space to all the matches
-	* as we backtrack up the recursive calls, then we append matched words a long the way (with breaks/spaces)
-* as backtrack up we will memoize the result
+
+- dynamic programming
+- recursively explore rest of the word after word match, if letters left in s to
+  explore
+- if match, then append the word with a space to all the matches \* as we
+  backtrack up the recursive calls, then we append matched words a long the way
+  (with breaks/spaces)
+- as backtrack up we will memoize the result
 
 **Base Cases**
-* if not s, return [] - no string, no result
-* if s starts with word, and len(word) == len(s) - append to result without space, this is end of word break
 
-Solution:
-`T: o(mn) S:o(mn) m: len(s), n: len(wordDict)`
+- if not s, return [] - no string, no result
+- if s starts with word, and len(word) == len(s) - append to result without
+  space, this is end of word break
+
+Solution: `T: o(mn) S:o(mn) m: len(s), n: len(wordDict)`
+
 ```python
 class Solution:
 	def wordBreak(self, s, wordDict):
@@ -1208,15 +1307,13 @@ class Solution:
 ```
 
 ## 150 Reverse Polish Notation
-* use a stack
-* loop through tokens:
-	* if current token in set of operators
-		* pop top two values and apply relevant operator
-	* else
-		* append to stack
 
-Solution:
-`t: o(n), s:o(n) n: len(token)`
+- use a stack
+- loop through tokens: _ if current token in set of operators _ pop top two
+  values and apply relevant operator _ else _ append to stack
+
+Solution: `t: o(n), s:o(n) n: len(token)`
+
 ```python
 class Solution:
 	def evalRPN(self, tokens):
@@ -1238,11 +1335,14 @@ class Solution:
 ```
 
 ## 454 4Sum ii
-* invariant: (i, j, k, l) such that A[i] + B[j] + C[k] + D[l] = 0
-* can be rewritten as A[i] + B[j] = -(C[k] + D[l])
-* use a hasmap to store all combinations of a + b sums - find all c + d sums that are complements to a+b
+
+- invariant: (i, j, k, l) such that A[i] + B[j] + C[k] + D[l] = 0
+- can be rewritten as A[i] + B[j] = -(C[k] + D[l])
+- use a hasmap to store all combinations of a + b sums - find all c + d sums
+  that are complements to a+b
 
 `T: o(n^2), S: o(n^2) n: len(A or B or C or D)`
+
 ```python
 class Solution:
 	def fourSumCount(self, A, B, C, D):
@@ -1258,12 +1358,14 @@ class Solution:
 ```
 
 ## 395 Longest Substring with at least K repeating characters
-* substring -> sliding window
-* if h represents the num unique characters, k min repetitions for every character
-	* want to find the max length of the candidate solutions that fulfill the h and k requirements
 
-Solution:
-`T: o(n) S: o(n) n: len(s)`
+- substring -> sliding window
+- if h represents the num unique characters, k min repetitions for every
+  character \* want to find the max length of the candidate solutions that
+  fulfill the h and k requirements
+
+Solution: `T: o(n) S: o(n) n: len(s)`
+
 ```python
 class Solution:
 	def longestSubstring(self, s, k):
@@ -1294,13 +1396,15 @@ class Solution:
 ```
 
 ## 76 Minimum Window Substring
-* sliding window
-* keep count of the characters within the window range.
-* expand to the right while we have relevant characters still to include in the substring
-* close the window while non-relevant characters are included
 
-Solution:
-`T: o(n), S: o(n) n: len(s)`
+- sliding window
+- keep count of the characters within the window range.
+- expand to the right while we have relevant characters still to include in the
+  substring
+- close the window while non-relevant characters are included
+
+Solution: `T: o(n), S: o(n) n: len(s)`
+
 ```python
 class Solution:
 	def minWindow(self, s, t):
@@ -1325,10 +1429,11 @@ class Solution:
 ```
 
 ## 3 Longest Substring without repeating characters
-* sliding window
 
-Solution 1:
-`T: o(n), S: o(n) n: len(s)`
+- sliding window
+
+Solution 1: `T: o(n), S: o(n) n: len(s)`
+
 ```python
 class Solution:
 	def lengthOfLongestSubstring(self, s):
@@ -1345,8 +1450,8 @@ class Solution:
 
 ## 384 Shuffle an Array
 
-Solution:
-`T: o(n), S: o(1). n: len(nums)`
+Solution: `T: o(n), S: o(1). n: len(nums)`
+
 ```python
 class Solution:
 	def __init__(self, nums):
@@ -1365,8 +1470,7 @@ class Solution:
 
 ## 380 Insert Delete GetRandom O(1)
 
-Solution:
-`T: o(1), S: o(n). n: len(nums)`
+Solution: `T: o(1), S: o(n). n: len(nums)`
 
 ```python
 class RandomizedSet:
@@ -1395,10 +1499,10 @@ class RandomizedSet:
 		return self.array[random.randrange(len(self.array))]
 ```
 
-
 ## 378 Kth Smallest in a Sorted Matrix
-Solution 1:
-`t: o(min(k,n)*klog(n)) s: min(k, n). n: len(matrix)`
+
+Solution 1: `t: o(min(k,n)*klog(n)) s: min(k, n). n: len(matrix)`
+
 ```python
 from heapq import *
 class Solution:
@@ -1416,6 +1520,7 @@ class Solution:
 ```
 
 Solution 2:
+
 ```python
 class Solution:
 	def kthSmallest(self, matrix, k):
@@ -1446,8 +1551,10 @@ class Solution:
 ```
 
 ## 328 Odd Even Linked List
-* two pointers, weaving through linked list
-* point the odd list to the even list
+
+- two pointers, weaving through linked list
+- point the odd list to the even list
+
 ```python
 class Solution:
 	def oddEvenList(self, head):
@@ -1463,8 +1570,9 @@ class Solution:
 ```
 
 ## 350 Intersection of Two Arrays II
-Solution 1:
-`t: o(n), s: o(m). n: len(nums1), m: len(nums2)`
+
+Solution 1: `t: o(n), s: o(m). n: len(nums1), m: len(nums2)`
+
 ```python
 class Solution:
 	def intersect(self, nums1, nums2):
@@ -1476,8 +1584,8 @@ class Solution:
 		return res
 ```
 
-Solution 2:
-`t: o(max(nlogn, mlogm): s: o(1) n: len(nums1), m: len(nums2)`
+Solution 2: `t: o(max(nlogn, mlogm): s: o(1) n: len(nums1), m: len(nums2)`
+
 ```python
 class Solution:
 	def intersect(self, nums1, nums2):
@@ -1497,8 +1605,8 @@ class Solution:
 
 ## 341 Flatten Nested Iterator
 
-Solution 1:
-`t: o(max(m, n)) s: o(n) n: len(list) m: largest amount of nesting`
+Solution 1: `t: o(max(m, n)) s: o(n) n: len(list) m: largest amount of nesting`
+
 ```python
 #class NestedInteger:
 #    def isInteger(self) -> bool:
@@ -1532,8 +1640,8 @@ class NestedIterator:
 		return False
 ```
 
-Solution 2:
-`t: o(max(m, n)) s: o(n) n: len(list) m: largest amount of nesting`
+Solution 2: `t: o(max(m, n)) s: o(n) n: len(list) m: largest amount of nesting`
+
 ```python
 class NestedIterator:
 	def __init__(self, nestedList: [NestedInteger]):
@@ -1551,7 +1659,9 @@ class NestedIterator:
 ```
 
 ## 326 Power of Three
+
 `t: o(logn), s: o(1) n: how many times original n can be divided by 3`
+
 ```python
 class Solution:
 	def isPowerOfThree(self, n):
@@ -1564,14 +1674,13 @@ class Solution:
 ```
 
 ## 334 Increasing Triplet Subsequence
-* first is always updated such that it can only go downwards
-* second is only updated if first is already update
-* e.g. i: [1, 3, 0, 5]
-	first: 1, -> 0
-	second: 3
 
-Solution:
-`T: o(n), S: o(1). n: len(nums)`
+- first is always updated such that it can only go downwards
+- second is only updated if first is already update
+- e.g. i: [1, 3, 0, 5] first: 1, -> 0 second: 3
+
+Solution: `T: o(n), S: o(1). n: len(nums)`
+
 ```python
 class Solution:
 	def increasingTriplet(self, nums):
@@ -1585,10 +1694,11 @@ class Solution:
 				return True
 		return False
 ```
+
 ## 237 Delete Node in a Linked List
 
-Solution:
-`T: o(1), S: o(1)`
+Solution: `T: o(1), S: o(1)`
+
 ```python
 class Solution:
 	def deleteNode(self, node):
@@ -1614,6 +1724,7 @@ class Solution:
 ## 224 Basic Calculator
 
 `T: o(n), S: o(n). n: len(s)`
+
 ```python
 class Solution:
 	def calculate(self, s):
@@ -1638,10 +1749,11 @@ class Solution:
 ```
 
 ## 227 Basic Calculator II
-* stack
 
-Solution:
-`T: o(n), S: o(n). n: len(s)`
+- stack
+
+Solution: `T: o(n), S: o(n). n: len(s)`
+
 ```python
 class Solution:
 	def calculate(self, s):
@@ -1675,9 +1787,10 @@ class Solution:
 ```
 
 ## 324 Wiggle Sort II
-* sort the array
-* odd positions to be the reverse of the first half of array
-* even positions to be the reverse of the second half of array
+
+- sort the array
+- odd positions to be the reverse of the first half of array
+- even positions to be the reverse of the second half of array
 
 ```python
 class Solution:
@@ -1688,11 +1801,12 @@ class Solution:
 ```
 
 ## 146 LRU Cache
-* use hashtable and doubly linked list
-* Hashtable {key: Node}
-* self.head side represents the Least Recently Used
-* self.tail side repesents the Most Recently Used
-* Node {key, val}
+
+- use hashtable and doubly linked list
+- Hashtable {key: Node}
+- self.head side represents the Least Recently Used
+- self.tail side repesents the Most Recently Used
+- Node {key, val}
 
 ```python
 class Node:
@@ -1742,7 +1856,9 @@ class LRUCache:
 ```
 
 ## 56 Merge Intervals
-* merge all overlapping intervals given array of intervals, `intervals`
+
+- merge all overlapping intervals given array of intervals, `intervals`
+
 ```python
 class Solution:
 	def merge(self, intervals):
@@ -1761,6 +1877,7 @@ class Solution:
 ```
 
 ## 57 Insert Intervals
+
 ```python
 class Solution:
 	def insert(self, intervals, newInterval):
@@ -1799,45 +1916,57 @@ class Solution:
 ```
 
 ## How to deal with Buy and Sell stock problems
-* Base Cases
+
+- Base Cases
+
 ```
 T[-1][k][0] = T[i][0][0] = 0
 T[-1][k][1] = T[i][0][1] = -Infinity
 ```
 
-* General Recurrence Relationship
+- General Recurrence Relationship
+
 ```
 T[i][k][0] = max(T[i][k][0], T[i-1][k][1] + prices[i])
 T[i][k][1] = max(T[i][k][1], T[i-1][k-1][0] - prices[i])
 ```
 
 **Notation**
-* `i`: `ith` day
-* `k`: at most `k` transactions
-* `prices[i]`: price of stock at `ith` day
-* `[0]`: holding 0 stock end of day
-* `[1]`: holding 1 stock end of day
-* `T[i][k][0]`: Most profit on `ith` day, with at most `k` transactions, holding `0` stock EOD
-* `T[i][k][1]`: Most profit on `ith` day, with at most `k` transactions, holding `1` stock EOD
+
+- `i`: `ith` day
+- `k`: at most `k` transactions
+- `prices[i]`: price of stock at `ith` day
+- `[0]`: holding 0 stock end of day
+- `[1]`: holding 1 stock end of day
+- `T[i][k][0]`: Most profit on `ith` day, with at most `k` transactions, holding
+  `0` stock EOD
+- `T[i][k][1]`: Most profit on `ith` day, with at most `k` transactions, holding
+  `1` stock EOD
 
 **Explanation**
-* Base Cases:
-	* `T[-1][k][0] = T[i][0][0] = 0`: because holding 0 stocks in the beginning means 0 profit
-	* `T[-1][k][1] = T[i][0][1] = -Infinity`: because having 1 stock to start off with is impossible
 
-* We want a relationship between the `T[i][k][0/1]` and its sub-problems `T[i-1][k][0/1], T[i][k-1][0/1], T[i-1][k-1][0/1]...`
-* If we have this relationship we can solve the problem with dynamic programming (since the relationship is recursive)
+- Base Cases: _ `T[-1][k][0] = T[i][0][0] = 0`: because holding 0 stocks in the
+  beginning means 0 profit _ `T[-1][k][1] = T[i][0][1] = -Infinity`: because
+  having 1 stock to start off with is impossible
+
+- We want a relationship between the `T[i][k][0/1]` and its sub-problems
+  `T[i-1][k][0/1], T[i][k-1][0/1], T[i-1][k-1][0/1]...`
+- If we have this relationship we can solve the problem with dynamic programming
+  (since the relationship is recursive)
 
 ### 121 Best Time to Buy and Sell Stock
+
 `Case 1: k = 1`
 
-* Recurrence Relationships
+- Recurrence Relationships
+
 ```
 	T[i][1][0] = max(T[i][1][0], T[i][1][1] + prices[i])
 	T[i][1][1] = max(T[i][1][1], T[i][0][0] - prices[i]) = max(T[1][1][0], -prices[i])
 ```
 
 Solution:`t: o(n), s: o(1). n: len(prices)`
+
 ```python
 class Solution:
 	def maxProfit(self, prices):
@@ -1848,18 +1977,21 @@ class Solution:
 ```
 
 ### 122 Best Time to Buy and Sell Stock II
+
 `Case 2: k = Infinity`
 
-* Recurrence Relationships
+- Recurrence Relationships
+
 ```
 	T[i][k][0] = max(T[i][k[0], T[i][k][1] + prices[i])
 	T[i][k][1] = max(T[i][k][1], T[i][k-1][0] - prices[i]) = max(T[i][k][1], T[i][k][0] - prices[i])
 ```
-* Note:
-	* if `k = Infinity`: `T[i][k-1][0] = T[i][k][0]`
-	* this is because as lim(k) approaching infinity is the same as lim(k-1) approaching infinityA
+
+- Note: _ if `k = Infinity`: `T[i][k-1][0] = T[i][k][0]` _ this is because as
+  lim(k) approaching infinity is the same as lim(k-1) approaching infinityA
 
 Solution:`t: o(n), s: o(1). n: len(prices)`
+
 ```python
 class Solution:
 	def maxProfit(self, prices):
@@ -1870,9 +2002,11 @@ class Solution:
 ```
 
 ### 123 Best Time to Buy and Sell Stock III
+
 `Case 3: k = 2`
 
-* Recurrence Relationships
+- Recurrence Relationships
+
 ```
 	T[i][2][0] = max(T[i][2][0], T[i][2][1] + prices[i])
 	T[i][2][1] = max(T[i][2][1], T[i][1][1] - prices[i])
@@ -1881,6 +2015,7 @@ class Solution:
 ```
 
 Solution:`t: o(n), s: o(1). n: len(prices)`
+
 ```python
 class Solution:
 	def maxProfit(self, prices):
@@ -1895,13 +2030,17 @@ class Solution:
 ```
 
 ### 188 Best Time to Buy and Sell Stock IV
+
 `Case 4: k is arbitrary`
-* given that there are n stocks (len(prices))
-	* there can only be at most n/2 profitable transactions
-	* if k >= n/2, this scenario models exactly like case II (infinite transactions possible)
-* otherwise we have to consider the states of possible transactions leading up to k
+
+- given that there are n stocks (len(prices)) _ there can only be at most n/2
+  profitable transactions _ if k >= n/2, this scenario models exactly like case
+  II (infinite transactions possible)
+- otherwise we have to consider the states of possible transactions leading up
+  to k
 
 `t:o(kn) s:o(k), k:k, n: len(prices)`
+
 ```python
 class Solution:
 	def maxProfit(self, prices, k):
@@ -1919,11 +2058,14 @@ class Solution:
 ```
 
 ### 309 Best Time to Buy and Sell Stock with Cooldown
+
 `Case 5: k is Infinite but with cooldown`
 
-* same as case II but we have consider `i-2`th day instead of `i-1`th date when we consider a transaction (during a buy)
+- same as case II but we have consider `i-2`th day instead of `i-1`th date when
+  we consider a transaction (during a buy)
 
 Solution: `t:o(n) s:o(1), n: len(prices)`
+
 ```python
 class Solution:
 	def maxProfit(self, prices):
@@ -1936,10 +2078,13 @@ class Solution:
 ```
 
 ### 714 Best Time to Buy and Sell Stock with Transaction Fee
+
 `Case 6: k is Infinite but with fee`
-* similar to case II, but with fee
+
+- similar to case II, but with fee
 
 Solution: `t:o(n) s:o(1), n: len(prices)`
+
 ```python
 class Solution:
 	def maxProfit(self, prices, fee):
@@ -1950,7 +2095,9 @@ class Solution:
 ```
 
 ## 278 First Bad Version
+
 Solution: `t:o(n), s:o(1). n: n`
+
 ```python
 class Solution:
 	def firstBadVersion(self, n):
@@ -1965,10 +2112,10 @@ class Solution:
 		return i
 ```
 
-
 ## 38 Combination Sum
-* we're given a set of candidates with no duplicates (we don't have to sort)
-* (1) can reuse the numbers
+
+- we're given a set of candidates with no duplicates (we don't have to sort)
+- (1) can reuse the numbers
 
 ```python
 class Solution:
@@ -1987,8 +2134,9 @@ class Solution:
 ```
 
 ## 39 Combination Sum 2
-* we are given duplicates
-* only allowed to use numbers once
+
+- we are given duplicates
+- only allowed to use numbers once
 
 ```python
 class Solution:
@@ -2008,6 +2156,7 @@ class Solution:
 ```
 
 ## 77 Combinations
+
 ```python
 class Solution:
 	def combine(self, n, k):
@@ -2024,6 +2173,7 @@ class Solution:
 ```
 
 ## 78 Subsets
+
 ```python
 class Solution:
 	def subsets(self, nums):
@@ -2038,6 +2188,7 @@ class Solution:
 ```
 
 ## 90 Subsets II
+
 ```python
 class Solution:
 	def subsetsWithDup(self, nums: List[int]) -> List[List[int]]:
@@ -2053,6 +2204,7 @@ class Solution:
 ```
 
 ## 46 Permutations
+
 ```python
 class Solution:
 	def permute(self, nums):
@@ -2069,6 +2221,7 @@ class Solution:
 ```
 
 ## 47 Permutations II
+
 ```python
 class Solution:
 	def permuteUnique(self, nums):
@@ -2089,11 +2242,11 @@ class Solution:
 
 ## 60 Permutations Sequence
 
-* given n and k, we want to give the kth permutation
-* you can build the kth permutation without building all permutations
+- given n and k, we want to give the kth permutation
+- you can build the kth permutation without building all permutations
 
-Solution:
-`t:o(n) s:o(n). n: given n`
+Solution: `t:o(n) s:o(n). n: given n`
+
 ```python
 class Solution:
 	def getPermutation(self, n, k):
@@ -2112,6 +2265,7 @@ class Solution:
 ```
 
 ## 367 Valid Perfect Squares
+
 ```python
 class Solution:
 	def isPerfectSquare(self, num):
@@ -2127,6 +2281,7 @@ class Solution:
 ```
 
 ## 383 Ransom Notes
+
 ```python
 class Solution:
 	def canConstruct(self, ransomNote, magazine):
@@ -2138,9 +2293,12 @@ class Solution:
 ```
 
 ## 402 Remove K Digits
-* one way to think about this is if we have a set of sorted digits "123456789"
-	* to remove k digits and get the smallest number, start removing k digits from the right
-* if we don't have a sorted set of digits, then prioritize the removal numbers that don't fulfill that criteria
+
+- one way to think about this is if we have a set of sorted digits
+  "123456789" \* to remove k digits and get the smallest number, start removing
+  k digits from the right
+- if we don't have a sorted set of digits, then prioritize the removal numbers
+  that don't fulfill that criteria
 
 ```python
 class Solution:
@@ -2156,6 +2314,7 @@ class Solution:
 ```
 
 ## 525 Contiguous Array
+
 ```python
 class Solution:
 	def findMaxLength(self, nums):
@@ -2171,6 +2330,7 @@ class Solution:
 ```
 
 ## 451 Sort Characters by Frequency
+
 ```python
 class Solution:
 	def frequencySort(self, s):
@@ -2179,8 +2339,9 @@ class Solution:
 ```
 
 ## 1008 Construct Binary Search Tree from Preorder Traversal
-Solution 1 (iterative):
-`t:o(n^2), s:o(n)`
+
+Solution 1 (iterative): `t:o(n^2), s:o(n)`
+
 ```python
 class Solution:
 	def bstFromPreorder(self, preorder):
@@ -2197,8 +2358,9 @@ class Solution:
 				stack.append(last.right)
 		return root
 ```
-Solution 2 (recursive):
-`t:o(n^2), s:o(n)`
+
+Solution 2 (recursive): `t:o(n^2), s:o(n)`
+
 ```python
 class Solution:
 	def bstFromPreorder(self, preorder):
@@ -2211,10 +2373,12 @@ class Solution:
 ```
 
 ## 993 Cousins in Binary Tree
-* all nodes have a unique integer val
-* BFS
-* we check if children both exists and are x and y -> return False
-* if vals x and y exist in the same level and are sibilings -> return True
+
+- all nodes have a unique integer val
+- BFS
+- we check if children both exists and are x and y -> return False
+- if vals x and y exist in the same level and are sibilings -> return True
+
 ```python
 class Solution:
 	def isCousins(self, root, x, y):
@@ -2238,7 +2402,9 @@ class Solution:
 ```
 
 ## 560 Subarray Sums Equals K
-* keep track of complements
+
+- keep track of complements
+
 ```python
 class Solution:
 	def subarraySum(self, nums: List[int], k: int) -> int:
@@ -2250,7 +2416,9 @@ class Solution:
 			preSum[currSum] = preSum.get(currSum, 0) + 1
 		return res
 ```
+
 ## 1232 Check if it is a Straight Line
+
 ```python
 class Solution:
 	def checkStraightLine(self, coordinates):
@@ -2265,7 +2433,9 @@ class Solution:
 ```
 
 ## 218 The Skyline Problem
+
 `t: o(nlogn), s:`
+
 ```python
 from heapq import heappop, heappush
 class Solution:
@@ -2282,7 +2452,9 @@ class Solution:
 			if res[-1][1] != -live[0][0]: res += [pos, -live[0][0]],
 		return res[1:]
 ```
+
 ## 437. Path Sum III
+
 ```python
 class Solution:
 	def pathSum(self, root: TreeNode, sum: int) -> int:
@@ -2301,7 +2473,9 @@ class Solution:
 ```
 
 ## 73 Daily Temperatures
-* stack
+
+- stack
+
 ```python
 class Solution:
 	def dailyTemperatures(self, T):
@@ -2315,7 +2489,9 @@ class Solution:
 ```
 
 ## 901 Online Stock Span
-* stack
+
+- stack
+
 ```python
 class StockSpanner:
 	def __init__(self):
@@ -2329,6 +2505,7 @@ class StockSpanner:
 ```
 
 ## 84 Largest Rectangle in Histogram
+
 ```python
 class Solution:
 	def largestRectangleArea(self, heights):
@@ -2343,8 +2520,8 @@ class Solution:
 		return res
 ```
 
-
 ## 406 Queue Reconstruction By Height
+
 ```python
 class Solution:
 	def reconstructQueue(self, people):
@@ -2359,8 +2536,8 @@ class Solution:
 		return res
 ```
 
-
 ## 621 Task Scheduler
+
 ```python
 from heapq import heapify, heappop, heappush
 class Solution:
@@ -2381,6 +2558,7 @@ class Solution:
 ```
 
 ## 918 Maximum Sum Circular Subarray
+
 ```python
 class Solution:
 	def maxSubarraySumCircular(self, A):
@@ -2395,9 +2573,9 @@ class Solution:
 ```
 
 ## 1035 Uncrossed Lines
-* dp problem
-Solution 1:
-`t:o(nm), s:o(nm) n: len(A), m: len(B)`
+
+- dp problem Solution 1: `t:o(nm), s:o(nm) n: len(A), m: len(B)`
+
 ```python
 class Solution:
 	def maxUncrossedLines(self, A, B):
@@ -2413,6 +2591,7 @@ class Solution:
 ```
 
 ## 329 Longest Increasing Path in a Matrix
+
 ```python
 class Solution:
 	def longestIncreasingPath(self, matrix):
@@ -2436,10 +2615,14 @@ class Solution:
 ```
 
 ## 54 Spiral Matrix
-* we have l, r, u, d variables to keep track of the current perimeter
-* increment and decrement those as necessary as we move the considered perimeter towards center
-* our while condition is `l <= r and u <= d` because `r = len(matrix[0])-1 and d = len(matrix) - 1`
-`t:o(mn), s:o(1) m:len(matrix), n:len(matrix[0])`
+
+- we have l, r, u, d variables to keep track of the current perimeter
+- increment and decrement those as necessary as we move the considered perimeter
+  towards center
+- our while condition is `l <= r and u <= d` because
+  `r = len(matrix[0])-1 and d = len(matrix) - 1`
+  `t:o(mn), s:o(1) m:len(matrix), n:len(matrix[0])`
+
 ```python
 class Solution:
 	def spiralOrder(self, matrix):
@@ -2464,7 +2647,9 @@ class Solution:
 ```
 
 ### 498 Diagonal Traverse
+
 `t: o(mn), s: o(1) n: len(matrix), m: len(matrix[0])`
+
 ```python
 class Solution:
 	def findDiagonalOrder(self, matrix):
@@ -2485,7 +2670,9 @@ class Solution:
 ```
 
 ## 935 Knight Dialer
+
 `t: o(n), s: o(1)`
+
 ```python
 class Solution:
 	def knightDialer(self, N):
@@ -2501,7 +2688,9 @@ class Solution:
 ```
 
 ## 23 Merge K Sorted Lists
+
 `t: o(nklogk) s:o(k) n: avg length of lists, k: num sorted lists`
+
 ```python
 from heapq import heapify, heappush, heappop
 class Solution:
@@ -2520,9 +2709,12 @@ class Solution:
 ```
 
 ## 33 Search in a Rotated Sorted Array
-* at each point figure out which halfs are sorted and unsorted
-* check if the target fits in the sorted portion, binary search through that if so
-* if it doesn't fit, then repeat the algorithm on unsorted portion
+
+- at each point figure out which halfs are sorted and unsorted
+- check if the target fits in the sorted portion, binary search through that if
+  so
+- if it doesn't fit, then repeat the algorithm on unsorted portion
+
 ```python
 class Solution:
 	def search(self, nums, target):
@@ -2558,6 +2750,7 @@ class NumArray:
 ```
 
 ### 435 Non-Overlapping Intervals
+
 ```python
 class Solution:
 	def eraseOverlapIntervals(self, intervals):
@@ -2573,6 +2766,7 @@ class Solution:
 ```
 
 ## 1277 Count Square Submatrices with All Ones
+
 ```python
 class Solution:
 	def countSquares(self, matrix):
@@ -2585,8 +2779,11 @@ class Solution:
 					dp[i][j] = 1 + min(dp[i-1][j], dp[i][j-1], dp[i-1][j-1])
 		return sum(sum(row) for row in dp)
 ```
+
 ## 567 Permutaiton in String
-* sliding window
+
+- sliding window
+
 ```python
 from collections import Counter
 class Solution:
@@ -2602,7 +2799,9 @@ class Solution:
 ```
 
 ## 886 Possible Bipartition
-* dfs
+
+- dfs
+
 ```python
 class Solution:
 	def possibleBipartition(self, N: int, dislikes: List[List[int]]) -> bool:
@@ -2627,7 +2826,9 @@ class Solution:
 ```
 
 ### 297 Serialize and Deserialize Binary Tree
-* preorder traversal
+
+- preorder traversal
+
 ```python
 class Codec:
 		def serialize(self, root):
@@ -2656,8 +2857,9 @@ class Codec:
 ```
 
 ## 543 Diameter of Binary Tree
-Solution 1:
-`t: o(v + e), s: o(v+e) v: num vertices, e: num edges`
+
+Solution 1: `t: o(v + e), s: o(v+e) v: num vertices, e: num edges`
+
 ```python
 class Solution:
 		def diameterOfBinaryTree(self, root: TreeNode) -> int:
@@ -2672,6 +2874,7 @@ class Solution:
 ```
 
 ### 687 Longest Univalue Path
+
 ```python
 class Solution:
 	def longestUnivaluePath(self, root: TreeNode) -> int:
@@ -2689,6 +2892,7 @@ class Solution:
 ```
 
 ### 889 Construct Binary Tree from Preorder and Postorder Traversal
+
 ```python
 class Solution:
 	def constructFromPrePost(self, pre: List[int], post: List[int]) -> TreeNode:
@@ -2703,6 +2907,7 @@ class Solution:
 ```
 
 ### 787 Cheapest Flights Within K Stops
+
 ```python
 class Solution:
 	def findCheapestPrice(self, n: int, flights: List[List[int]], src: int, dst: int, K: int) -> int:
@@ -2723,7 +2928,8 @@ class Solution:
 ```
 
 ## 35 Search Insert Position
-* given a sorted array and a target value, return index if target is found
+
+- given a sorted array and a target value, return index if target is found
 
 ```python
 class Solution:
@@ -2741,6 +2947,7 @@ class Solution:
 ```
 
 ## 1249 Minimum Remove To Make Valid Parentheses
+
 ```python
 class Solution:
 	def minRemoveToMakeValid(self, s: str) -> str:
@@ -2759,6 +2966,7 @@ class Solution:
 ```
 
 ## 348 Design Tic-Tac-Toe
+
 ```python
 class TicTacToe:
 		def __init__(self, n: int):
@@ -2781,6 +2989,7 @@ class TicTacToe:
 ```
 
 ## 763 Partition Labels
+
 ```python
 class Solution:
 	def partitionLabels(self, S):
@@ -2797,7 +3006,9 @@ class Solution:
 ```
 
 ## 953 Verify an Alien Dictionary
+
 `t: o(nm) s: o(1) n:length(words) m:avg length of word`
+
 ```python
 class Solution:
 	def isAlienSorted(self, words, order):
@@ -2815,7 +3026,9 @@ class Solution:
 ```
 
 ## 25 Reverse Nodes in k-group
+
 `t: o(n), s:o(1)`
+
 ```python
 class Solution:
 	def reverseKGroup(self, head, k):
@@ -2836,6 +3049,7 @@ class Solution:
 ```
 
 ## 994 Rotting Oranges
+
 ```python
 class Solution:
   def orangesRotting(self, grid: List[List[int]]) -> int:
@@ -2862,14 +3076,41 @@ class Solution:
           dq.append((x, y))
     return minutes if fresh == 0 else -1
 ```
-* there is the edge case for the last iteration where all the oranges are now rotten
-  * can handle by checking if fresh oranges are still in play in the while loop:
+
+- there is the edge case for the last iteration where all the oranges are now
+  rotten
+  - can handle by checking if fresh oranges are still in play in the while loop:
     ```python
     while dq and fresh > 0:
       ...
     ```
-  * can also handle by subtracting 1 from the result
-    * also have to handle the edge case where there are no rotten fruit (can't have -1 minutes)
+  - can also handle by subtracting 1 from the result
+    - also have to handle the edge case where there are no rotten fruit (can't
+      have -1 minutes)
     ```python
       return max(0, minutes -1) if fresh == 0 else -1
     ```
+
+## 174 Dungeon Game
+
+- top down dynamic progamming (starting from end working way to beginning)
+- `dp[i][j]` represents the minimum health needed to reach the princess, if
+  starting at (i,j)
+- want minimum of the candidates: - `dp[i+1][j] - dungeon[i][j]`
+  - `dp[i][j+1] - dungeon[i][j]`
+- if at least one of these candidates are <= 0, then we know that a knight can
+  make it with 1 HP
+
+```python
+class Solution:
+	def calculateMinimumHP(self, dungeon: List[List[int]]) -> int:
+		m, n = len(dungeon), len(dungeon[0])
+		dp = [[float('inf')]*(n+1) for _ in range(m+1)]
+		dp[m-1][n] = dp[m][n-1] = 1
+
+		for i in range(m-1, -1, -1):
+			for j in range(n-1, -1, -1):
+				dp[i][j]  = max(min(dp[i+1][j], dp[i][j+1])-dungeon[i][j], 1)
+
+		return dp[0][0]
+```
