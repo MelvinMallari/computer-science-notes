@@ -1437,7 +1437,7 @@ Solution 1: `T: o(n), S: o(n) n: len(s)`
 ```python
 class Solution:
 	def lengthOfLongestSubstring(self, s):
-		seen = collections.defaultdict(int)
+		seen = {}
 		i = res = 0
 		for j, ch in enumerate(s):
 			if ch in seen and i <= seen[ch]:
@@ -3113,4 +3113,60 @@ class Solution:
 				dp[i][j]  = max(min(dp[i+1][j], dp[i][j+1])-dungeon[i][j], 1)
 
 		return dp[0][0]
+```
+
+## 94 Binary Tree Inorder Traversal
+
+`t:o(n), s:o(n) n: number of nodes in tree`
+
+```python
+class Solution:
+	def inorderTraversal(self, root):
+		stack, res = [], []
+		while stack or root:
+			if root:
+				stack.append(root)
+				root = root.left
+			else:
+				node = stack.pop()
+				res.append(node.val)
+				root = node.right
+		return res
+```
+
+## 516 Longest Palidromic Subsequence
+
+`t:o(n^2), s:o(n^2) n: length of word`
+
+```python
+class Solution:
+	def longestPalindromeSubseq(self, s):
+		dp = [[0]*len(s) for _ in range(len(s))]
+		for i in range(len(s)-1, -1, -1):
+			dp[i][i] = 1
+			for j in range(i+1, len(s)):
+				if s[i] == s[j]:
+					dp[i][j] = dp[i+1][j-1] + 2
+				else:
+					dp[i][j] = max(dp[i][j-1], dp[i+1][j])
+		return dp[0][len(s)-1]
+```
+
+### 238 Product of Array Except Self
+
+```python
+class Solution:
+	def productExceptSelf(self, nums: List[int]) -> List[int]:
+		res = []
+		left = 1
+		for i in range(len(nums)):
+			res.append(left)
+			left *= nums[i]
+
+		right = 1
+		for i in range(len(nums)-1, -1, -1):
+			res[i] = res[i]*right
+			right *= nums[i]
+
+		return res
 ```
