@@ -489,6 +489,7 @@ class Solution:
 			if offset*2 == i: offset *= 2
 			res.append(res[i-offset]+1)
 		return res
+
 ```
 
 ## 14 Longest Common Prefix
@@ -1412,6 +1413,7 @@ class Solution:
 		start = end = i = 0
 		missing = len(t)
 		for j, ch in enumerate(s, 1):
+			# must check that counter[ch] > 0 BEFORE counter[ch] -= 1
 			if counter[ch] > 0: missing -= 1
 			counter[ch] -= 1
 			if missing == 0:
@@ -1806,6 +1808,7 @@ class Solution:
 - Hashtable {key: Node}
 - self.head side represents the Least Recently Used
 - self.tail side repesents the Most Recently Used
+- least recently used -> most recently used
 - Node {key, val}
 
 ```python
@@ -1951,8 +1954,12 @@ T[i][k][1] = max(T[i][k][1], T[i-1][k-1][0] - prices[i])
 
 - We want a relationship between the `T[i][k][0/1]` and its sub-problems
   `T[i-1][k][0/1], T[i][k-1][0/1], T[i-1][k-1][0/1]...`
+
 - If we have this relationship we can solve the problem with dynamic programming
   (since the relationship is recursive)
+
+- notice we define a transaction as having bought (could have been sold, but not
+  both)
 
 ### 121 Best Time to Buy and Sell Stock
 
@@ -2358,6 +2365,9 @@ class Solution:
 				stack.append(last.right)
 		return root
 ```
+
+- you are going to fail. take everything as a learning experience. it only takes
+  one success.
 
 Solution 2 (recursive): `t:o(n^2), s:o(n)`
 
@@ -3152,7 +3162,7 @@ class Solution:
 		return dp[0][len(s)-1]
 ```
 
-### 238 Product of Array Except Self
+## 238 Product of Array Except Self
 
 ```python
 class Solution:
@@ -3170,3 +3180,5 @@ class Solution:
 
 		return res
 ```
+
+## 211 Design Add and Search Words Data Structure
